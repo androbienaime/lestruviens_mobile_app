@@ -15,6 +15,12 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import CustomAnimated from '@/components/CustomAnimated';
+import { ThemedView } from '@/components/ThemedView';
+import InputField from '@/components/InputField';
+import ThemedButton from '@/components/ThemedButton';
+import { ThemedText } from '@/components/ThemedText';
+import { lightColors } from '@/theme';
+import { ThemedLink } from '@/components/ThemedLink';
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState('');
@@ -24,7 +30,7 @@ const RegisterScreen = () => {
   
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ThemedView style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
@@ -36,73 +42,51 @@ const RegisterScreen = () => {
                 source={require('@/assets/images/logo.png')}
                 style={styles.logo}
             />
-            <Text style={styles.title}>Créer un compte</Text>
-            <Text style={styles.subtitle}>
+            <ThemedText type='subtitle1'>Créer un compte</ThemedText>
+            <ThemedText type='subtitle2'>
               Rejoignez-nous et découvrez toutes nos fonctionnalités
-            </Text>
+            </ThemedText>
           </View>
 
           <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Ionicons name="person-outline" size={22} color="#7B8794" style={styles.inputIcon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Nom complet"
-                placeholderTextColor="#7B8794"
-                value={name}
-                onChangeText={setName}
-              />
-            </View>
+            <InputField
+              label="Nom complet"
+              placeholder="Nom complet"
+              leftIconName="person-outline"
+              value={name}
+              onChangeText={setName}
+            />
 
-            <View style={styles.inputContainer}>
-              <Ionicons name="mail-outline" size={22} color="#7B8794" style={styles.inputIcon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                placeholderTextColor="#7B8794"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={email}
-                onChangeText={setEmail}
-              />
-            </View>
+          <InputField
+            label="Email"
+            placeholder="Email"
+            leftIconName="mail-outline"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+          />
 
-            <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={22} color="#7B8794" style={styles.inputIcon} />
-              <TextInput
-                style={styles.input}
-                placeholder="Mot de passe"
-                placeholderTextColor="#7B8794"
-                secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={setPassword}
-              />
-              <TouchableOpacity
-                style={styles.eyeIcon}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons
-                  name={showPassword ? 'eye-outline' : 'eye-off-outline'}
-                  size={22}
-                  color="#7B8794"
-                />
-              </TouchableOpacity>
-            </View>
+          <InputField
+            isPasswordInput={true}
+            label="Email"
+            placeholder="Mot de passe"
+            leftIconName="lock-closed-outline"
+            keyboardType="email-address"
+            value={password}
+            onChangeText={setPassword}
+          />
 
             <TouchableOpacity style={styles.forgotPassword}>
-              <Text style={styles.forgotPasswordText}>Mot de passe oublié?</Text>
+              <ThemedLink >Mot de passe oublié?</ThemedLink>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.registerButton}>
-              <LinearGradient
-                colors={['#4776E6', '#8E54E9']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.gradient}
-              >
-                <Text style={styles.registerButtonText}>S'inscrire</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+            <ThemedButton 
+                  title="S'inscrire" 
+                  fullWidth
+                  size="medium"
+                  variant={'primary'}
+                />
+            
           </View>
 
           <View style={styles.separator}>
@@ -114,7 +98,7 @@ const RegisterScreen = () => {
           <View style={styles.socialContainer}>
             <TouchableOpacity style={styles.socialButton}>
               <Image
-                source={{ uri: 'https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-suite-everything-you-need-know-about-google-newest-0.png' }}
+                source={require('@/assets/images/google.png')}
                 style={styles.socialIcon}
                 resizeMode="contain"
               />
@@ -122,7 +106,7 @@ const RegisterScreen = () => {
 
             <TouchableOpacity style={styles.socialButton}>
               <Image
-                source={{ uri: 'https://www.freepnglogos.com/uploads/apple-logo-png/apple-logo-png-dallas-shootings-don-add-are-speech-zones-used-4.png' }}
+                source={require('@/assets/images/apple.png')}
                 style={styles.socialIcon}
                 resizeMode="contain"
               />
@@ -130,7 +114,7 @@ const RegisterScreen = () => {
 
             <TouchableOpacity style={styles.socialButton}>
               <Image
-                source={{ uri: 'https://www.freepnglogos.com/uploads/facebook-logo-icon/facebook-logo-icon-file-facebook-icon-svg-wikimedia-commons-4.png' }}
+                source={require('@/assets/images/facebook.png')}
                 style={styles.socialIcon}
                 resizeMode="contain"
               />
@@ -138,7 +122,7 @@ const RegisterScreen = () => {
 
             <TouchableOpacity style={styles.socialButton}>
               <Image
-                source={{ uri: 'https://www.freepnglogos.com/uploads/tik-tok-logo-png/tik-tok-logo-tiktok-logo-transparent-png-pictures-icons-and-png-25.png' }}
+                source={require('@/assets/images/tiktok.png')}
                 style={styles.socialIcon}
                 resizeMode="contain"
               />
@@ -147,21 +131,18 @@ const RegisterScreen = () => {
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Vous avez déjà un compte? </Text>
-            <TouchableOpacity>
-              <Text style={styles.loginText}>Se connecter</Text>
-            </TouchableOpacity>
+              <ThemedLink >Se connecter</ThemedLink>
           </View>
           </CustomAnimated>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </ThemedView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F9FC',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -192,31 +173,7 @@ const styles = StyleSheet.create({
   form: {
     marginBottom: 24,
   },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    marginBottom: 16,
-    paddingHorizontal: 16,
-    height: 56,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
-  },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: '#1A2138',
-  },
-  eyeIcon: {
-    padding: 8,
-  },
+
   forgotPassword: {
     alignSelf: 'flex-end',
     marginBottom: 24,
@@ -282,7 +239,8 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 'auto',
+    marginTop: 20
+    // marginTop: 'auto',
   },
   footerText: {
     fontSize: 14,

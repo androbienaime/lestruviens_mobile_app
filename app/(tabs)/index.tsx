@@ -7,11 +7,14 @@ import { ThemedView } from '@/components/ThemedView';
 import LoginScreen from '@/screens/auth/LoginScreen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import RegisterScreen from '@/screens/auth/RegisterScreen';
+import { Text } from 'react-native';
 
 export default function HomeScreen() {
+  
+
   return (
       <SafeAreaView style={styles.container}>
-          <RegisterScreen />
+          <LoginScreen />
       </SafeAreaView>
   );
 }

@@ -3,6 +3,7 @@ import InputField from '@/components/InputField';
 import { Link } from 'expo-router';
 import { navigate } from 'expo-router/build/global-state/routing';
 import React, { useState } from 'react';
+import { ThemedView } from '../../components/ThemedView';
 import {
   View,
   Text,
@@ -18,6 +19,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
+import ThemedButton from '@/components/ThemedButton';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -34,7 +36,7 @@ const LoginScreen = () => {
   return (
     <>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      <SafeAreaView style={styles.safe}>
+      <ThemedView style={styles.safe}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <KeyboardAvoidingView
             style={{ flex: 1 }}
@@ -56,18 +58,20 @@ const LoginScreen = () => {
 
               <View style={styles.form}>
                 <InputField
-                  placeholder="Adresse e-mail"
-                  placeholderTextColor="#aaa"
+                  label="Email"
+                  placeholder="Email"
+                  leftIconName="mail-outline"
                   keyboardType="email-address"
-                  autoCapitalize="none"
                   value={email}
                   onChangeText={setEmail}
                 />
 
                 <InputField
+                  isPasswordInput={true}
+                  label="Email"
                   placeholder="Mot de passe"
-                  placeholderTextColor="#aaa"
-                  secureTextEntry
+                  leftIconName="lock-closed-outline"
+                  keyboardType="email-address"
                   value={password}
                   onChangeText={setPassword}
                 />
@@ -76,9 +80,17 @@ const LoginScreen = () => {
                   <Text style={styles.forgotText}>Mot de passe oublié ?</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                <ThemedButton 
+                  title="Se connecter" 
+                  onPress={handleLogin}
+                  fullWidth
+                  size="medium"
+                  variant={'primary'}
+                />
+
+                {/* <TouchableOpacity style={styles.button} onPress={handleLogin}>
                   <Text style={styles.buttonText}>Se connecter</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
 
               <View style={styles.separator}>
@@ -88,23 +100,25 @@ const LoginScreen = () => {
               </View>
 
               <View style={styles.socialRow}>
-                {['Google', 'Facebook', 'Apple'].map((provider) => (
+                {['Google', 'Facebook', 'Apple', 'Tiktok'].map((provider) => (
                   <TouchableOpacity
                     key={provider}
                     style={styles.socialButton}
                     onPress={() => handleSocial(provider)}
                   >
                     <Image
-                      source={{
-                        uri:
+                        source={
                           provider === 'Google'
-                            ? 'https://img.icons8.com/color/48/google-logo.png'
+                            ? require('@/assets/images/google.png')
                             : provider === 'Facebook'
-                            ? 'https://img.icons8.com/color/48/facebook-new.png'
-                            : 'https://img.icons8.com/ios-filled/50/mac-os.png',
-                      }}
-                      style={styles.socialIcon}
-                    />
+                            ? require('@/assets/images/facebook.png')
+                            : provider === 'Apple'
+                            ? require('@/assets/images/apple.png')
+                            : require('@/assets/images/tiktok.png')
+                        }
+                        style={styles.socialIcon}
+                      />
+
                   </TouchableOpacity>
                 ))}
               </View>
@@ -119,7 +133,7 @@ const LoginScreen = () => {
             </ScrollView>
           </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
-      </SafeAreaView>
+      </ThemedView>
     </>
   );
 };
@@ -127,7 +141,6 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   container: {
     padding: 24,
@@ -203,17 +216,16 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   socialButton: {
-    width: 54,
-    height: 54,
-    borderRadius: 14,
-    backgroundColor: '#fff',
+    width: 70,
+    height: 56,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
     elevation: 2,
   },
   socialIcon: {

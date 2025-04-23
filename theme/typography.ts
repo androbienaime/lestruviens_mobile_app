@@ -104,11 +104,12 @@ const typography = {
     letterSpacing: 0.15,
   } as TextStyle,
   
+  
   subtitle1: {
     ...baseTextStyle,
     fontFamily: fontFamily.regular,
     fontWeight: fontWeight.regular,
-    fontSize: 24, // Sous-titre selon votre spécification
+    fontSize: 28, // Sous-titre selon votre spécification
     lineHeight: 32,
     letterSpacing: 0.15,
   } as TextStyle,
