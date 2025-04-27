@@ -1,10 +1,10 @@
 import React from "react";
 
-const ForgotPasswordScreen = ()=>{
+const chatScreen = () =>{
     return (
         <>
         </>
     )
 }
 
-export default ForgotPasswordScreen;
+export default chatScreen;

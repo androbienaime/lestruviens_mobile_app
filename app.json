@@ -1,6 +1,7 @@
 {
   "expo": {
-    "name": "LesTruviens",
+    "name": "main",
+    "displayName" : "LesTruviens",
     "slug": "LesTruviens",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -23,15 +24,16 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
+    "entryPoint": "./index.js",
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#fafafa"
         }
       ]
     ],

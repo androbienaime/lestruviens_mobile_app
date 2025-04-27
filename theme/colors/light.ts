@@ -128,6 +128,7 @@ const lightColors = {
     primary: palette.primary500,
     secondary: palette.secondary500,
     disabled: palette.neutral300,
+    gray: palette.neutral500,
   },
 
   shadow: {

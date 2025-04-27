@@ -106,7 +106,9 @@ const palette = {
       secondary: '#1E1E1E',
       tertiary: '#2C2C2C',
     },
-    
+    border: {
+      default: palette.neutral400,
+    },
     text: {
       primary: '#FFFFFF',
       secondary: '#E5E5E5',
@@ -118,7 +120,8 @@ const palette = {
     button:{
       primary: palette.primary500,
       secondary: palette.secondary500,
-      disabled: '#f4f4',
+      disabled: palette.neutral300,
+      gray: palette.neutral500,
 
     },
     // ... autres groupes de couleurs
