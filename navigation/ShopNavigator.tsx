@@ -1,7 +1,7 @@
 // navigation/ShopNavigator.tsx
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ShopStackParamList } from '../@types/navigation';
+import { ShopStackParamList } from '../src/@types/navigation';
 import HomeScreen from '../screens/shop/HomeScreen';
 import CategoryScreen from '../screens/shop/CategoryScreen';
 import ProductDetailsScreen from '../screens/shop/ProductDetailsScreen';

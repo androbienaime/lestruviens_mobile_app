@@ -1,7 +1,7 @@
 // navigation/CartNavigator.tsx
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { CartStackParamList } from '../@types/navigation';
+import { CartStackParamList } from '../src/@types/navigation';
 import CartScreen from '@/screens/cart/CartScreen';
 import CheckoutScreen from '@/screens/cart/CheckoutScreen';
 import OrderConfirmationScreen from '@/screens/cart/OrderConfirmationScreen';

@@ -1,7 +1,7 @@
 // navigation/ProfileNavigator.tsx
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ProfileStackParamList } from '../@types/navigation';
+import { ProfileStackParamList } from '../src/@types/navigation';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import OrderHistoryScreen from '../screens/profile/OrderHistoryScreen';
 // import OrderDetailsScreen from '../screens/profile/OrderDetailsScreen';

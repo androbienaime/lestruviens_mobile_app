@@ -12,12 +12,13 @@ export interface User {
   export interface Product {
     id: number;
     name: string;
+    slug: string;
     description: string;
     price: number;
     discount_price?: number;
     images: string[];
     category_id: number;
-    category: Category;
+    category: Category[];
     in_stock: boolean;
     stock_quantity: number;
     attributes: ProductAttribute[];
@@ -130,4 +131,8 @@ export interface User {
   export interface AuthResponse {
     user: User;
     token: string;
+  }
+
+  export interface Review{
+    
   }

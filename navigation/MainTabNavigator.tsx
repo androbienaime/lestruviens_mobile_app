@@ -2,13 +2,13 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather } from '@expo/vector-icons';
-import { MainTabParamList } from '../@types/navigation';
+import { MainTabParamList } from '../src/@types/navigation';
 import ShopStackNavigator from './ShopNavigator';
 import CartStackNavigator from './CartNavigator';
 import ProfileStackNavigator from './ProfileNavigator';
 import CategoriesScreen from '@/screens/shop/CategoryScreen';
-import chatScreen from '@/screens/chat/chatScreen';
 import { useThemeColors, useTheme, useThemeTypography } from '@/theme';
+import ChatScreen from '@/screens/chat/ChatScreen';
 
 const MainTab = createBottomTabNavigator<MainTabParamList>();
 
@@ -49,7 +49,7 @@ const MainTabNavigator: React.FC = () => {
     >
       <MainTab.Screen name="Shop" component={ShopStackNavigator} options={{ title: 'Accueil' }} />
       <MainTab.Screen name="Categories" component={CategoriesScreen} options={{ title: 'Catégories' }} />
-      <MainTab.Screen name="Chat" component={chatScreen} options={{ title: 'Leki' }} />
+      <MainTab.Screen name="Chat" component={ChatScreen} options={{ title: 'Leki' }} />
       <MainTab.Screen name="Cart" component={CartStackNavigator} options={{ title: 'Panier' }} />
       <MainTab.Screen name="Profile" component={ProfileStackNavigator} options={{ title: 'Profil' }} />
     </MainTab.Navigator>

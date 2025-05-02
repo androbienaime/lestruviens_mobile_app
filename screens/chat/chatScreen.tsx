@@ -1,10 +1,10 @@
 import React from "react";
 
-const chatScreen = () =>{
+const ChatScreen = () =>{
     return (
         <>
         </>
     )
 }
 
-export default chatScreen;
+export default ChatScreen;

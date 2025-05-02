@@ -102,7 +102,7 @@ const palette = {
     palette,
     
     background: {
-      primary: '#121212',
+      primary: palette.gray,
       secondary: '#1E1E1E',
       tertiary: '#2C2C2C',
     },
@@ -114,6 +114,8 @@ const palette = {
       secondary: '#E5E5E5',
       tertiary: '#A3A3A3',
       link: palette.primary500,
+      disabled: palette.neutral400,
+
       // ... autres styles de texte
     },
     
