@@ -2,7 +2,7 @@ import apiClient from '../client';
 import { ApiResponse, CategoriesQueryParams, PaginatedResponse, ProductsQueryParams } from '@/src/@types/api';
 import { Category, Product, Review } from '@/src/@types/models';
 
-export const productsService = {
+export const categoriesService = {
   async getCategories(params: CategoriesQueryParams = {}): Promise<PaginatedResponse<Category>> {
     const response = await apiClient.get<ApiResponse<PaginatedResponse<Category>>>('/categories', { params });
     return response.data;

@@ -7,6 +7,7 @@ import SearchProduct from "@/components/modules/products/SearchProduct";
 import { useThemeColors, useThemeTypography, useTheme } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
 import ProductList from "@/components/modules/products/ProductList";
+import CategoriesList from "@/components/modules/categories/CategoriesList";
 
 const HomeScreen = ()=>{
     const [searchText, setSearchText] = useState('');
@@ -45,6 +46,7 @@ const HomeScreen = ()=>{
             </ThemedView>
           </ThemedView>
           <ThemedView>
+              <CategoriesList />
               <ProductList />
           </ThemedView>
         </SafeAreaView>
