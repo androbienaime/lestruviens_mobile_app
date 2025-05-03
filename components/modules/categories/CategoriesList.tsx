@@ -1,3 +1,5 @@
+import Skeleton from "@/components/skeletonPlaceholder";
+import CategoriesSkeletonPlaceholder from "@/components/skeletonPlaceholder/CategoriesSkeletonPlaceholder";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { Category } from "@/src/@types/models";
@@ -33,9 +35,6 @@ const CategoriesList = () => {
     fetchCategories();
   }, []);
 
-  if (loading) {
-    return <Text>Chargement...</Text>;
-  }
 
     return (
         <ThemedView >
@@ -46,22 +45,30 @@ const CategoriesList = () => {
                 <Ionicons name="arrow-forward-outline" />
             </Pressable>
         </ThemedView>
+        {loading ? (
+          <Skeleton.Categories
+            itemCount={5} 
+            itemSize={70} 
+            itemTextWidth={60}
+          />
+        ) : (
+          <FlatList
+              data={categories} 
+              horizontal
+              showsHorizontalScrollIndicator
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({index, item}) => 
+                <Pressable>
+                  <ThemedView style={styles.item}>
+                      <Image source={{ uri: 'http://172.20.10.7:8000'+item.coverImage }} style={styles.itemImg} />
+                      <ThemedText style={{ color: colors.text.primary }}>{item.name}</ThemedText>
+                  </ThemedView>
+                </Pressable>
+              } 
+          />
+        )}
+      </ThemedView>
 
-        <FlatList
-            data={categories} 
-            horizontal
-            showsHorizontalScrollIndicator
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({index, item}) => 
-              <Pressable>
-                <ThemedView style={styles.item}>
-                    <Image source={{ uri: 'http://192.168.1.37:8000'+item.coverImage }} style={styles.itemImg} />
-                    <ThemedText style={{ color: colors.text.primary }}>{item.name}</ThemedText>
-                </ThemedView>
-              </Pressable>
-            } 
-        />
-    </ThemedView>
     )
 }
 
