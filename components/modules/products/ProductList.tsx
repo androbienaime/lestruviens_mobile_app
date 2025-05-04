@@ -1,20 +1,23 @@
 import { ThemedText } from "@/components/ThemedText";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { productsService } from '@/src/api/services/products.service';
 import { ThemedView } from "@/components/ThemedView";
 import { Product } from "@/src/@types/models";
 import { FlatList, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SearchProduct from "@/components/modules/products/SearchProduct";
-import { useThemeColors, useThemeTypography, useTheme } from "@/theme";
+import { useThemeColors, useThemeTypography, useTheme, typography } from '@/theme';
 import { Ionicons } from "@expo/vector-icons";
 import ProductCard from "./ProductCard";
+import Skeleton, { ProductsSkeletonPlaceholder } from "@/components/skeletonPlaceholder";
 
 const ProductList = ({...otherProps})=>{
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);    
     const colors = useThemeColors();
+    const typography = useThemeTypography();
 
+    const styles = useMemo(() => createStyles(colors, typography), [colors, typography]);
   
     useEffect(() => {
         const fetchProducts = async () => {
@@ -33,18 +36,22 @@ const ProductList = ({...otherProps})=>{
         fetchProducts();
       }, []);
     
-      if (loading) {
-        return <Text>Chargement...</Text>;
-      }
+     
     
       return (
-        <ThemedView style={styles.container}>
+        <ThemedView >
             <View style={styles.titleWrapper}>
                 <Text style={styles.title}>For you</Text>
                 <Pressable>
                     <ThemedText style={styles.titleBtn}>See All</ThemedText>
                 </Pressable>
             </View>
+            {loading ? (
+                <ProductsSkeletonPlaceholder 
+                  itemCount={4} 
+                  isHorizontal={false}
+                />
+            ) : (
                 <FlatList 
                 numColumns={2} 
                 data={products} 
@@ -54,29 +61,29 @@ const ProductList = ({...otherProps})=>{
                 renderItem={({index, item}) => 
                     <ProductCard item={item} index={index}/>
             }/>
+          )}
             
         </ThemedView>
     )
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any, typography: any) =>
+  StyleSheet.create({
   container:{
       marginHorizontal: 20,
     },
     titleWrapper:{
       flexDirection: "row",
       justifyContent: "space-between",
-      marginBottom: 10
+      marginBottom: 10,
+      marginHorizontal: 18
     },
     title:{
-      fontSize: 18,
-      fontWeight: "600",
-      letterSpacing: 0.6,
-      color: "#000"
+      ...typography.h4,
+      color: colors.text.primary
     },
     titleBtn:{
-      fontSize: 14,
-      fontWeight: "500"
+      ...typography.h5
     },
     itemsWrapper:{
       flexDirection: "row",

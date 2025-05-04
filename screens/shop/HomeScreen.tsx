@@ -49,7 +49,7 @@ const HomeScreen = ()=>{
           <ThemedView >
               <CategoriesList />
               <HomeSlider style={{ marginLeft: 18 }}/>
-              <ProductList style={styles.container} />
+              <ProductList />
           </ThemedView>
         </SafeAreaView>
     )

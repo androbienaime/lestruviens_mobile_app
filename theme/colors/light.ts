@@ -104,6 +104,7 @@ const lightColors = {
     secondary: palette.neutral50,
     tertiary: palette.neutral100,
     inverse: palette.inverseBackground,
+    white: palette.white
   },
 
   text: {

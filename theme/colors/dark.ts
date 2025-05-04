@@ -105,6 +105,7 @@ const palette = {
       primary: palette.gray,
       secondary: '#1E1E1E',
       tertiary: '#2C2C2C',
+      white:palette.black
     },
     border: {
       default: palette.neutral400,

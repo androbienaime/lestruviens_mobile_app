@@ -1,90 +1,156 @@
-import { ThemedText } from "@/components/ThemedText";
-import { Colors } from "@/constants/Colors";
-import { Product } from "@/src/@types/models";
-import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
-import React from "react";
-import { Dimensions, Pressable, Text } from "react-native";
-import { Image, StyleSheet, View } from "react-native";
+import React, { useMemo } from "react";
+import { Dimensions, Pressable, StyleSheet, Text, View, Image } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { Ionicons } from "@expo/vector-icons";
+
+import { Product } from "@/src/@types/models";
+import { ThemedView } from "@/components/ThemedView";
+import { ThemedText } from "@/components/ThemedText";
+import { typography, useThemeColors, useThemeTypography } from "@/theme";
 
 type Props = {
-    item : Product,
-    index: number
+  item: Product;
+  index: number;
 };
 
 const width = Dimensions.get("window").width - 40;
 
-const ProductCard = ({item, index} : Props) => {
-    return (
-        // <Link href={`/product-details/${item.id}`} asChild>
-            <Pressable>
-                <Animated.View style={styles.container} entering={FadeInDown.delay(300 + index * 100).duration(500)}>
-                    <Image source={{ uri: 'http://172.20.10.7:8000'+item.coverImage}} style={styles.productImg} />
-                    <Pressable style={styles.bookmark}>
-                        <Ionicons name="heart-outline" size={22} color={"#000"} />
-                    </Pressable>
-                    <View style={styles.productInfo}>
-                        <Text style={styles.price}>${item.price}</Text>
-                        <View style={styles.ratingWrapper}>
-                            <Ionicons name="star" size={20} color={"#D4AF34"} />
-                            <Text style={styles.rating}>4.7</Text>
-                        </View>
-                    </View>
-                    <Text style={styles.title}>{item.name}</Text>
-                </Animated.View>
+const ProductCard = ({ item, index }: Props) => {
+  const colors = useThemeColors();
+  const typography = useThemeTypography();
+
+  const styles = useMemo(() => createStyles(colors, typography), [colors, typography]);
+
+  return (
+    <Pressable>
+      <Animated.View
+        style={[styles.container, { backgroundColor: "#fff"}]}
+        entering={FadeInDown.delay(300 + index * 100).duration(500)}
+      >
+        {/* Product Image */}
+        <Image
+          source={{ uri: 'http://172.20.10.7:8000' + item.coverImage }}
+          style={styles.productImg} 
+        />
+
+        {/* Profile in corner */}
+        <Pressable style={styles.profileContainer}>
+          <ThemedView style={styles.profile}>
+            <Image source={require('@/assets/images/10.jpg')} style={styles.imgProfile} />
+            <Pressable onPress={() => console.log('Close pressed')} style={styles.closeBtn}>
+              <Ionicons name="add-sharp" size={14} color={colors.button.secondary} />
             </Pressable>
-        // </Link>
-    )
-}
+          </ThemedView>
+        </Pressable>
+
+        {/* Like icon */}
+        <Pressable style={styles.bookmark}>
+          <Ionicons name="heart-outline" size={22} color={colors.button.primary} />
+        </Pressable>
+
+        {/* Product Info */}
+        <ThemedView style={{ padding: 5, backgroundColor: "#fff" }}>
+          <View style={styles.productInfo}>
+            <Text style={[styles.price, { color: colors.text.primary }]}>${item.price}</Text>
+            <View style={styles.ratingWrapper}>
+              <Ionicons name="star" size={20} color={"#D4AF34"} />
+              <Text style={[styles.rating, { color: colors.text.secondary }]}>4.7</Text>
+            </View>
+          </View>
+          <Text style={[styles.title, { color: colors.text.primary }]}>{item.name}</Text>
+          <View style={styles.cartWrapper}>
+            <Ionicons name="cart" size={20} color={colors.button.primary} />
+          </View>
+        </ThemedView>
+      </Animated.View>
+    </Pressable>
+  );
+};
 
 export default ProductCard;
 
-const styles = StyleSheet.create({
-    container:{
+const createStyles = (colors: any, typography: any) =>
+
+    StyleSheet.create({
+    container: {
         width: width / 2,
-        height: 184,
-        marginLeft: 18,
+        height: 284,
+        marginHorizontal: 10,
         borderRadius: 14,
-        backgroundColor: "#fff"
+        overflow: "hidden",
     },
-    productImg:{
+    productImg: {
         width: "100%",
-        height: 150,
-        borderRadius: 14,
-        marginBottom: 10
+        height: 185,
+        borderTopEndRadius: 14,
+        borderTopLeftRadius: 14,
+        marginBottom: 10,
     },
-    bookmark:{
+    profileContainer: {
         position: "absolute",
-        right: 15,
-        top: 15,
-        backgroundColor: "rgba(255, 255, 255, 0.5)",
+        top: 0,
+        right: 0,
+        zIndex: 10,
+    },
+    profile: {
+        width: 40,
+        height: 40,
+        borderRadius: 14,
+        position: "relative",
+        borderColor: colors.button.secondary,
+        borderWidth:2
+    },
+    imgProfile: {
+        width: "100%",
+        height: "100%",
+        borderRadius: 25
+    },
+    closeBtn: {
+        position: 'absolute',
+        bottom: -10, // fait dépasser en dessous
+        left: '50%',
+        marginLeft: -9, // moitié de la taille (18 / 2)
+        backgroundColor: colors.button.primary,
+        width: 18,
+        height: 18,
+        borderRadius: 9,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: colors.border.default,
+        zIndex: 130,
+    },
+    
+    bookmark: {
+        position: "absolute",
+        right: 5,
+        top: 68,
+        backgroundColor: "rgba(255, 255, 255, 0.6)",
         padding: 5,
-        borderRadius: 30
+        borderRadius: 30,
+        zIndex: 5,
     },
-    title:{
-        fontSize: 14,
-        fontWeight: "400",
-        color: Colors.light.text,
-        letterSpacing: 1.1
+    title: {
+        ...typography.h4
     },
-    productInfo:{
+    productInfo: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginBottom: 8
+        marginBottom: 8,
     },
-    price:{
-        fontSize: 16,
-        fontWeight: "700",
-        color: Colors.light.tint
+    price: {
+       ...typography.h4
     },
-    ratingWrapper:{
+    ratingWrapper: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 5
+        gap: 5,
     },
-    rating:{
+    rating: {
         fontSize: 14,
-        color: "#222"
-    }
-})
+    },
+    cartWrapper: {
+        flexDirection: "row",
+        alignSelf: "flex-end",
+    },
+});

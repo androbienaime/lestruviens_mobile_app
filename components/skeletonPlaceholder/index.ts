@@ -12,9 +12,9 @@ export {
   export { CategorySkeletonItem } from './CategoriesSkeletonPlaceholder';
   export type { CategoriesSkeletonProps } from './CategoriesSkeletonPlaceholder';
   
-//   export { default as ProductsSkeletonPlaceholder } from './ProductsSkeletonPlaceholder';
-//   export { ProductSkeletonItem } from './ProductsSkeletonPlaceholder';
-//   export type { ProductsSkeletonProps } from './ProductsSkeletonPlaceholder';
+  export { default as ProductsSkeletonPlaceholder } from './ProductsSkeletonPlaceholder';
+  export { ProductSkeletonItem } from './ProductsSkeletonPlaceholder';
+  export type { ProductsSkeletonProps } from './ProductsSkeletonPlaceholder';
   
   // Exportation des types communs
   export type { 
@@ -25,12 +25,12 @@ export {
   
   // Objet Skeleton pour une utilisation simplifiée
   import CategoriesSkeletonPlaceholder from './CategoriesSkeletonPlaceholder';
-//   import ProductsSkeletonPlaceholder from './ProductsSkeletonPlaceholder';
+  import ProductsSkeletonPlaceholder from './ProductsSkeletonPlaceholder';
   import { SkeletonItem, SkeletonLoader } from './SkeletonBase';
   
   const Skeleton = {
     Categories: CategoriesSkeletonPlaceholder,
-    // Products: ProductsSkeletonPlaceholder,
+    Products: ProductsSkeletonPlaceholder,
     Loader: SkeletonLoader,
     Item: SkeletonItem,
   };

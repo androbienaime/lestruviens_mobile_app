@@ -5,9 +5,9 @@ import { ThemedView } from "@/components/ThemedView";
 import { Category } from "@/src/@types/models";
 import API_CONFIG from "@/src/api/config";
 import { categoriesService } from "@/src/api/services/categories.service";
-import { useThemeColors } from "@/theme";
+import { useThemeColors, useThemeTypography } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FlatList, Image, Pressable, StyleSheet, Text } from "react-native";
 
 
@@ -16,7 +16,10 @@ const CategoriesList = ({...otherProps}) => {
   const [loading, setLoading] = useState(true);
 
   const colors = useThemeColors();
+  const typography = useThemeTypography();
 
+  const styles = useMemo(() => createStyles(colors, typography), [colors, typography]);
+  
   useEffect(()=>{
     const fetchCategories = async () =>{
       try{
@@ -74,7 +77,8 @@ const CategoriesList = ({...otherProps}) => {
 
 export default CategoriesList;
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any, typography:any) => 
+  StyleSheet.create({
     titleWrapper:{
         flexDirection: "row",
         justifyContent: "space-between",
@@ -82,15 +86,12 @@ const styles = StyleSheet.create({
         marginHorizontal: 18
       },
       title:{
-        fontSize: 18,
-        fontWeight: "600",
-        letterSpacing: 0.6,
-        color: "#000"
+        ...typography.h4,
+        color: colors.text.primary
       },
       titleBtn:{
-        fontSize: 14,
-        fontWeight: "500",
-        color: "#000"
+        ...typography.h5,
+        color: colors.text.primary
       },
       titleBtnWrapper:{
         flexDirection: "row",
