@@ -11,7 +11,7 @@ import React, { useEffect, useState } from "react";
 import { FlatList, Image, Pressable, StyleSheet, Text } from "react-native";
 
 
-const CategoriesList = () => {
+const CategoriesList = ({...otherProps}) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -37,7 +37,7 @@ const CategoriesList = () => {
 
 
     return (
-        <ThemedView >
+        <ThemedView {...otherProps}>
         <ThemedView style={styles.titleWrapper}>
             <ThemedText style={styles.title}>Categories</ThemedText>
             <Pressable style={styles.titleBtnWrapper}>
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         marginBottom: 10,
-        marginHorizontal: 20
+        marginHorizontal: 18
       },
       title:{
         fontSize: 18,
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         gap:5, 
         alignItems: "center",
-        marginLeft: 20,
+        marginLeft: 18
       },
       itemImg:{
         height: 60, 

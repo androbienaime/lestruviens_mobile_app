@@ -8,6 +8,7 @@ import { useThemeColors, useThemeTypography, useTheme } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
 import ProductList from "@/components/modules/products/ProductList";
 import CategoriesList from "@/components/modules/categories/CategoriesList";
+import HomeSlider from "@/components/HomeSlider";
 
 const HomeScreen = ()=>{
     const [searchText, setSearchText] = useState('');
@@ -45,9 +46,10 @@ const HomeScreen = ()=>{
               </TouchableOpacity>
             </ThemedView>
           </ThemedView>
-          <ThemedView>
+          <ThemedView >
               <CategoriesList />
-              <ProductList />
+              <HomeSlider style={{ marginLeft: 18 }}/>
+              <ProductList style={styles.container} />
           </ThemedView>
         </SafeAreaView>
     )
@@ -56,13 +58,13 @@ const HomeScreen = ()=>{
 const styles = StyleSheet.create({
   container:{
     // flex : 1,
-    padding: 8
+    marginHorizontal: 18
   },
   header :{
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 8
+    paddingVertical: 8,
+    marginLeft: 10
   },
   searchWrapper:{
       flex: 1,
@@ -70,7 +72,7 @@ const styles = StyleSheet.create({
   },
   iconButtons:{
     marginLeft: 10,
-    padding: 6
+    padding: 6,
   }
 })
 export default HomeScreen;

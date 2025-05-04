@@ -17,6 +17,7 @@ export interface User {
     price: number;
     discount_price?: number;
     images: string[];
+    coverImage: string;
     category_id: number;
     category: Category[];
     in_stock: boolean;
