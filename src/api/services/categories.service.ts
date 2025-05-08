@@ -15,7 +15,7 @@ export const categoriesService = {
 
   async searchCategories(query: string, params: CategoriesQueryParams = {}): Promise<PaginatedResponse<Category>> {
     const searchParams = { ...params, search: query };
-    const response = await apiClient.get<ApiResponse<PaginatedResponse<Product>>>('/category/search', { params: searchParams });
+    const response = await apiClient.get<ApiResponse<PaginatedResponse<Category>>>('/category/search', { params: searchParams });
     return response.data;
   },
 

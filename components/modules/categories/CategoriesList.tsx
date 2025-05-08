@@ -10,8 +10,11 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useState } from "react";
 import { FlatList, Image, Pressable, StyleSheet, Text } from "react-native";
 
+type Props = {
+  refreshTrigger? : number;
+};
 
-const CategoriesList = ({...otherProps}) => {
+const CategoriesList = ({refreshTrigger, ...otherProps} : Props) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,12 +25,14 @@ const CategoriesList = ({...otherProps}) => {
   
   useEffect(()=>{
     const fetchCategories = async () =>{
+      setLoading(true);
       try{
         const response = (await categoriesService.getCategories());
         if(response){
           setCategories(response.data);
         }
       }catch(error){
+        setCategories([]);
         console.log("Erreur lors de la recuperation des categories", error);
       }finally{
         setLoading(false);
@@ -36,7 +41,7 @@ const CategoriesList = ({...otherProps}) => {
     };
 
     fetchCategories();
-  }, []);
+  }, [refreshTrigger]);
 
 
     return (
@@ -63,7 +68,7 @@ const CategoriesList = ({...otherProps}) => {
               renderItem={({index, item}) => 
                 <Pressable>
                   <ThemedView style={styles.item}>
-                      <Image source={{ uri: 'http://172.20.10.7:8000'+item.coverImage }} style={styles.itemImg} />
+                      <Image source={{ uri: item.coverImage }} style={styles.itemImg} />
                       <ThemedText style={{ color: colors.text.primary }}>{item.name}</ThemedText>
                   </ThemedView>
                 </Pressable>

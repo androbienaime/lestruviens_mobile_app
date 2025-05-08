@@ -1,78 +1,64 @@
-import { ThemedText } from "@/components/ThemedText";
-import React, { useEffect, useState } from "react";
-import { ThemedView } from "@/components/ThemedView";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import React, { useCallback, useState } from "react";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import SearchProduct from "@/components/modules/products/SearchProduct";
-import { useThemeColors, useThemeTypography, useTheme } from "@/theme";
-import { Ionicons } from "@expo/vector-icons";
+import { useThemeColors } from "@/theme";
+import { ThemedView } from "@/components/ThemedView";
 import ProductList from "@/components/modules/products/ProductList";
 import CategoriesList from "@/components/modules/categories/CategoriesList";
 import HomeSlider from "@/components/HomeSlider";
+import ProductFeatured from "@/components/modules/products/ProductFeatured";
+import Header from "@/components/Header";
+import { FlatList } from "react-native";
 
-const HomeScreen = ()=>{
-    const [searchText, setSearchText] = useState('');
-    const colors = useThemeColors();
+const HomeScreen = () => {
+  const colors = useThemeColors();
 
-    const handleSearch = () => {
-      console.log('Recherche de:', searchText);
-    };
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setRefreshTrigger(prev => prev + 1); // 🔁 Incrémente pour signaler un refresh
+
+    // Simule une requête API ou un rechargement
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 500);
+  }, []);
   
-    const handleCameraPress = () => {
-      console.log('Caméra activée');
-    };
-    
-    return (
-        <SafeAreaView style={{backgroundColor: colors.background.primary, flex: 1 }}>
-          <ThemedView style={styles.header}>
-            <ThemedView style={styles.searchWrapper}>
-                <SearchProduct
-                    value={searchText}
-                    onChangeText={setSearchText}
-                    onSearch={handleSearch}
-                    onCameraPress={handleCameraPress}
-                />
-            </ThemedView>
-
-            <ThemedView style={styles.iconButtons}>
-              <TouchableOpacity onPress={() => console.log('Wishlist')}>
-                <Ionicons name="filter-outline" size={28} color={colors.button.primary} />
-              </TouchableOpacity>
-            </ThemedView>
-
-            <ThemedView style={styles.iconButtons}>
-              <TouchableOpacity onPress={() => console.log('Wishlist')}>
-                <Ionicons name="heart-outline" size={28} color={colors.button.primary} />
-              </TouchableOpacity>
-            </ThemedView>
-          </ThemedView>
-          <ThemedView >
-              <CategoriesList />
-              <HomeSlider style={{ marginLeft: 18 }}/>
-              <ProductList />
-          </ThemedView>
-        </SafeAreaView>
-    )
-}
+  return (
+    <SafeAreaView style={{ backgroundColor: colors.background.primary, flex: 1 }}>
+      <ThemedView>
+        <Header />
+        <CategoriesList />
+        <FlatList
+          data={[1]} // dummy item
+          keyExtractor={() => "home-section"}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          renderItem={() => (
+            <View>
+              <ProductFeatured refreshTrigger={refreshTrigger}/>
+              <ProductList refreshTrigger={refreshTrigger} initialLimit={6}/>
+            </View>
+          )}
+          ListHeaderComponent={() => (
+            <View>
+              <HomeSlider style={{ marginLeft: 18 }} />
+            </View>
+          )}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 190 }} // ajuste selon la tab bar
+        />
+      </ThemedView>
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
-  container:{
-    // flex : 1,
-    marginHorizontal: 18
+  container: {
+    marginHorizontal: 18,
   },
-  header :{
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 8,
-    marginLeft: 10
-  },
-  searchWrapper:{
-      flex: 1,
-      maxWidth: '80%'
-  },
-  iconButtons:{
-    marginLeft: 10,
-    padding: 6,
-  }
-})
+});
+
 export default HomeScreen;

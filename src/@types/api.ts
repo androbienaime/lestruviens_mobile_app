@@ -39,6 +39,7 @@ export interface ProductsQueryParams {
   search?: string;
   sort?: string;
   featured?: boolean;
+  per_page?: number;  // Modifié de 'limit' à 'per_page'
 }
 
 export interface CategoriesQueryParams {

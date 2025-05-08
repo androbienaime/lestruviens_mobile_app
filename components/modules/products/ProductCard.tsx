@@ -21,15 +21,18 @@ const ProductCard = ({ item, index }: Props) => {
 
   const styles = useMemo(() => createStyles(colors, typography), [colors, typography]);
 
+  const handleProductDetails = () =>{
+    console.log("ok");
+  }
   return (
-    <Pressable>
+    <Pressable onPress={handleProductDetails}>
       <Animated.View
-        style={[styles.container, { backgroundColor: "#fff"}]}
+        style={[styles.container, { backgroundColor: colors.background.white}]}
         entering={FadeInDown.delay(300 + index * 100).duration(500)}
       >
         {/* Product Image */}
         <Image
-          source={{ uri: 'http://172.20.10.7:8000' + item.coverImage }}
+          source={{ uri: item.coverImage }}
           style={styles.productImg} 
         />
 
@@ -57,10 +60,12 @@ const ProductCard = ({ item, index }: Props) => {
               <Text style={[styles.rating, { color: colors.text.secondary }]}>4.7</Text>
             </View>
           </View>
-          <Text style={[styles.title, { color: colors.text.primary }]}>{item.name}</Text>
-          <View style={styles.cartWrapper}>
-            <Ionicons name="cart" size={20} color={colors.button.primary} />
-          </View>
+          <ThemedView style={styles.productFooter} >
+            <ThemedText numberOfLines={2} ellipsizeMode="tail" style={[styles.title, { color: colors.text.primary }]}>{item.name}</ThemedText>
+            <View style={styles.cartWrapper}>
+              <Ionicons name="cart" size={20} color={colors.button.primary} />
+            </View>
+          </ThemedView>
         </ThemedView>
       </Animated.View>
     </Pressable>
@@ -131,15 +136,20 @@ const createStyles = (colors: any, typography: any) =>
         zIndex: 5,
     },
     title: {
-        ...typography.h4
+        ...typography.h6
     },
     productInfo: {
         flexDirection: "row",
         justifyContent: "space-between",
         marginBottom: 8,
     },
+    productFooter:{
+      position: "relative",
+      height: 50,
+      backgroundColor: colors.background.white
+    },
     price: {
-       ...typography.h4
+       ...typography.h4,
     },
     ratingWrapper: {
         flexDirection: "row",
@@ -150,6 +160,9 @@ const createStyles = (colors: any, typography: any) =>
         fontSize: 14,
     },
     cartWrapper: {
+        position: "absolute",
+        bottom: 3,
+        right: 3,
         flexDirection: "row",
         alignSelf: "flex-end",
     },

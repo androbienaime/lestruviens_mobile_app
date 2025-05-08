@@ -5,7 +5,7 @@ import { Product, Review } from '@/src/@types/models';
 export const productsService = {
   async getProducts(params: ProductsQueryParams = {}): Promise<PaginatedResponse<Product>> {
     const response = await apiClient.get<ApiResponse<PaginatedResponse<Product>>>('/products', { params });
-    return response.data;
+    return response.data;  // Ajustement pour s'adapter à la structure de réponse
   },
 
   async getProductById(id: string): Promise<Product> {
