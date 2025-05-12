@@ -32,7 +32,7 @@ const ShopStackNavigator: React.FC = () => {
       <ShopStack.Screen 
         name="ProductDetails" 
         component={ProductDetailsScreen} 
-        options={{ title: 'Détails du produit' }} 
+        options={{ title: 'Détails du produit', headerShown: false}} 
       />
       {/* <ShopStack.Screen 
         name="Search" 

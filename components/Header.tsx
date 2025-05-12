@@ -1,62 +1,75 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { ThemedView } from "./ThemedView";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import SearchProduct from "./modules/products/SearchProduct";
-import { useThemeColors } from "@/theme";
+import { typography, useThemeColors } from "@/theme";
+import SearchProductComponent from "./modules/products/SearchProductComponent";
+import { useNavigation } from "@react-navigation/native";
 
-const Header = () => {
-    const [searchText, setSearchText] = useState('');
+type Props = {
+    backgroundColor ?: string;
+    inputBackground ?: string;
+    previousButton?: boolean;
+    style?: ViewStyle;
+};
+const Header = (
+  {backgroundColor = "", 
+    inputBackground = "",
+    previousButton = false,
+    style,
+    ...otherProps} : Props) => {
     const colors = useThemeColors();
 
-    const handleSearch = () => {
-      console.log('Recherche de:', searchText);
-    };
-  
-    const handleCameraPress = () => {
-      console.log('Caméra activée');
-    };
+    const styles = useMemo(() => createStyles(colors, typography, backgroundColor), [colors, typography, backgroundColor]);
+    const navigation = useNavigation();
 
     return (
-        <ThemedView style={styles.header}>
-        <ThemedView style={styles.searchWrapper}>
-            <SearchProduct
-                value={searchText}
-                onChangeText={setSearchText}
-                onSearch={handleSearch}
-                onCameraPress={handleCameraPress}
-            />
-        </ThemedView>
+        <ThemedView style={[styles.header, style]}  {...otherProps}>
+          {previousButton && (
+            <ThemedView style={styles.iconButtons}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Ionicons name="arrow-back" size={28} color={colors.button.primary} />
+              </TouchableOpacity>
+            </ThemedView>
+          )}
+          <ThemedView style={styles.searchWrapper} >
+              <SearchProductComponent backgroundColor={inputBackground} />
+          </ThemedView>
 
-        <ThemedView style={styles.iconButtons}>
-          <TouchableOpacity onPress={() => console.log('Wishlist')}>
-            <Ionicons name="filter-outline" size={28} color={colors.button.primary} />
-          </TouchableOpacity>
-        </ThemedView>
+          <ThemedView style={styles.iconButtons}>
+            <TouchableOpacity onPress={() => console.log('Wishlist')}>
+              <Ionicons name="filter-outline" size={28} color={colors.button.primary} />
+            </TouchableOpacity>
+          </ThemedView>
 
-        <ThemedView style={styles.iconButtons}>
-          <TouchableOpacity onPress={() => console.log('Wishlist')}>
-            <Ionicons name="heart-outline" size={28} color={colors.button.primary} />
-          </TouchableOpacity>
-        </ThemedView>
+          <ThemedView style={styles.iconButtons}>
+            <TouchableOpacity onPress={() => console.log('Wishlist')}>
+              <Ionicons name="heart-outline" size={28} color={colors.button.primary} />
+            </TouchableOpacity>
+          </ThemedView>
       </ThemedView>
     )
 }
 
-const styles = StyleSheet.create({
-    header :{
-      flexDirection: "row",
-      alignItems: "center",
-      paddingVertical: 8,
-      marginLeft: 10
-    },
-    searchWrapper:{
-        flex: 1,
-        maxWidth: '80%'
-    },
-    iconButtons:{
-      marginLeft: 10,
-      padding: 6,
-    }
+const createStyles = (colors: any, typography: any, backgroundColor: string) =>
+  StyleSheet.create({
+      header :{
+        flexDirection: "row",
+        alignItems: "center",
+        paddingVertical: 8,
+        marginLeft: 10,
+        backgroundColor: backgroundColor
+      },
+      searchWrapper:{
+          flex: 1,
+          maxWidth: '80%',
+          backgroundColor: backgroundColor
+      },
+      iconButtons:{
+        marginLeft: 10,
+        padding: 6,
+        backgroundColor: backgroundColor
+      }
   })
 export default Header;

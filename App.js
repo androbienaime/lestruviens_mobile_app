@@ -9,8 +9,10 @@ import { CartProvider } from './context/CartContext';
 import { ProductProvider } from './context/ProductContext';
 import RootNavigator from './navigation/RootNavigator';
 
+
 // Enable screens for better performance
 enableScreens();
+
 
 // Custom theme
 const MyTheme = {
@@ -77,6 +79,7 @@ const linking = {
 
 // Root App component
 export default function App() {
+
   return (
     <SafeAreaProvider>
       <StatusBar barStyle="dark-content" />

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, TextInput, StyleSheet, TouchableOpacity, TextInputProps } from 'react-native';
 import { Ionicons, Feather } from '@expo/vector-icons'; // ou 'react-native-vector-icons'
-import { useThemeColors } from '@/theme';
+import { typography, useThemeColors } from '@/theme';
 
 interface SearchProductProps {
   value: string;
@@ -9,6 +9,7 @@ interface SearchProductProps {
   onCameraPress: () => void;
   onSearch: () => void;
   inputProps?: TextInputProps;
+  backgroundColor?: string;
 }
 
 const SearchProduct: React.FC<SearchProductProps> = ({
@@ -17,10 +18,13 @@ const SearchProduct: React.FC<SearchProductProps> = ({
   onCameraPress,
   onSearch,
   inputProps,
+  backgroundColor = "#FFFFFF"
 }) => {
 
   const colors = useThemeColors();
 
+  const styles = useMemo(() => createStyles(colors, typography, backgroundColor), [colors, typography, backgroundColor]);
+  
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={onSearch}>
@@ -47,22 +51,23 @@ const SearchProduct: React.FC<SearchProductProps> = ({
 
 export default SearchProduct;
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 15,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    margin: 10,
-  },
-  input: {
-    flex: 1,
-    marginHorizontal: 8,
-    fontSize: 16,
-  },
-  icon: {
-    paddingHorizontal: 4,
-  },
-});
+const createStyles = (colors : any, typography : any, backgroundColor : string) =>
+    StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: backgroundColor ? backgroundColor : "#FFFFFF",
+      borderRadius: 15,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      margin: 10,
+    },
+    input: {
+      flex: 1,
+      marginHorizontal: 8,
+      fontSize: 16,
+    },
+    icon: {
+      paddingHorizontal: 4,
+    },
+  });

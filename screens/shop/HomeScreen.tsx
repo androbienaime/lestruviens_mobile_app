@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, ImageSourcePropType } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeColors } from "@/theme";
 import { ThemedView } from "@/components/ThemedView";
@@ -9,6 +9,7 @@ import HomeSlider from "@/components/HomeSlider";
 import ProductFeatured from "@/components/modules/products/ProductFeatured";
 import Header from "@/components/Header";
 import { FlatList } from "react-native";
+
 
 const HomeScreen = () => {
   const colors = useThemeColors();

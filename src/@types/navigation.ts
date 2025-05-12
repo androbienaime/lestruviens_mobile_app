@@ -1,6 +1,7 @@
 // types/navigations.ts
 
 import { NavigatorScreenParams } from '@react-navigation/native';
+import { Product } from './models';
 
 // Paramètres pour les écrans d'authentification
 export type AuthStackParamList = {
@@ -17,7 +18,7 @@ export type ShopStackParamList = {
     title: string;
   };
   ProductDetails: {
-    productId: string;
+    product : Product;
   };
   Search: {
     query?: string;

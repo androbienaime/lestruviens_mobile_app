@@ -22,7 +22,8 @@ export interface User {
     category: Category[];
     in_stock: boolean;
     stock_quantity: number;
-    attributes: ProductAttribute[];
+    declination: Declination[];
+    currency: Currency;
     created_at: string;
     updated_at: string;
   }
@@ -72,6 +73,28 @@ export interface User {
     selected_attributes?: Record<string, string>;
   }
   
+  export interface Currency{
+    iso_code : string;
+    symbol: string;
+    name: string;
+    country: string;
+    exchange_rate: number;
+  }
+
+  export interface Declination{
+    price: number;
+    quantity: number;
+    sku: string;
+    declination_images?: [];
+    value : Values[];
+  }
+
+  export interface Values{
+    id: number;
+    value: string;
+    color?: string;
+  }
+
   export enum OrderStatus {
     PENDING = 'pending',
     PAID = 'paid',

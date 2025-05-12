@@ -2,6 +2,9 @@ import React, { useMemo } from "react";
 import { Dimensions, Pressable, StyleSheet, Text, View, Image } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { ShopStackParamList } from "@/src/@types/navigation";
 
 import { Product } from "@/src/@types/models";
 import { ThemedView } from "@/components/ThemedView";
@@ -18,11 +21,12 @@ const width = Dimensions.get("window").width - 40;
 const ProductCard = ({ item, index }: Props) => {
   const colors = useThemeColors();
   const typography = useThemeTypography();
+  const navigation = useNavigation<NativeStackNavigationProp<ShopStackParamList>>();
 
   const styles = useMemo(() => createStyles(colors, typography), [colors, typography]);
 
   const handleProductDetails = () =>{
-    console.log("ok");
+    navigation.navigate("ProductDetails", {product: item});
   }
   return (
     <Pressable onPress={handleProductDetails}>
