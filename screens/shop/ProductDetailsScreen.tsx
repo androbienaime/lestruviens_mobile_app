@@ -7,10 +7,12 @@ import { useThemeColors, typography, useThemeTypography } from '@/theme';
 import { Ionicons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useMemo, useState } from "react";
-import { Image, StyleSheet, Text, TextInput, View } from "react-native";
+import { FlatList, Image, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Declination } from '../../src/@types/models';
 import CustomRadioInput from "@/components/CustomRadioInput";
+import QuantityControl from "@/components/QuantityControl";
+import { Keyboard } from "react-native";
 
 
 type Props = NativeStackScreenProps<ShopStackParamList, 'ProductDetails'>;
@@ -34,6 +36,9 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         console.log('Taille sélectionnée:', value);
       };
 
+      const handleQuantityChange = (value: number) => {
+        console.log('La nouvelle quantité est:', value);
+      };
       // Options pour le type couleur
       const handleOptionSelect = (value: string) => {
         setSelectedOption(value);
@@ -65,27 +70,35 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                         backgroundColor={colors.background.white} 
                         inputBackground={colors.background.primary} 
                     />
-                    <ThemedView style={styles.controlThemedView}>
-                        <ProductSlider 
-                            images={product.images}
-                            autoplay={false} 
-                            horizontalMargin={0}
-                            marginVertical={0}
-                            height={400}
-                        />
+                    <FlatList
+                    data={[1]} // dummy item
+                    keyExtractor={() => "home-section"}
+                    //   refreshing={refreshing}
+                    //   onRefresh={onRefresh}
+                    renderItem={() => (
+                        <View>
 
-                        <ThemedView style={styles.container}>
-                            <View style={styles.detailsContainer}>
-                                <ThemedView style={styles.controlThemedView}>
-                                    <ThemedText style={styles.productDetails}>Details du produit</ThemedText>
-                                    <ThemedText style={styles.productTitle}>{product.name}</ThemedText>
-                                </ThemedView>
-                                <ThemedView style={[styles.controlThemedView, styles.detailsIcons]}>
-                                    <Ionicons name="share-outline" size={32} />
-                                    <Ionicons name="heart" size={25} style={{marginLeft: 10}} color={"red"} />
-                                </ThemedView>
-                           </View>
-                           <View style={styles.priceAndRating}>
+                        <ThemedView style={styles.controlThemedView}>
+                            <ProductSlider 
+                                images={product.images}
+                                autoplay={false} 
+                                horizontalMargin={0}
+                                marginVertical={0}
+                                height={400}
+                            />
+                        <Pressable onPress={() => Keyboard.dismiss()}>
+                            <ThemedView style={styles.container}>
+                                <View style={[styles.detailsContainer, styles.subTitle]}>
+                                    <ThemedView style={styles.controlThemedView}>
+                                        <ThemedText style={styles.caption}>Details du produit</ThemedText>
+                                        <ThemedText style={styles.productTitle}>{product.name}</ThemedText>
+                                    </ThemedView>
+                                    <ThemedView style={[styles.controlThemedView, styles.detailsIcons]}>
+                                        <Ionicons name="share-outline" size={32} />
+                                        <Ionicons name="heart" size={25} style={{marginLeft: 10}} color={"red"} />
+                                    </ThemedView>
+                                </View>
+                            <View style={styles.priceAndRating}>
                                 <View style={styles.priceContainer}>
                                     <ThemedText style={styles.productPrice}>
                                         {product.currency.symbol}
@@ -98,33 +111,59 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                                     <Ionicons name="star" size={20} color={"#D4AF34"} />
                                     <Text style={[styles.rating, { color: colors.text.secondary }]}>3.5k pers. ont noté</Text>
                                 </View>
-                           </View>
+                            </View>
 
-                            <ThemedView style={styles.controlThemedView}>
-                                <ThemedText style={styles.productDetails}>Selectionner Taille</ThemedText>
-                                <View style={{marginLeft: -8}}>
-                                    <CustomRadioInput
-                                        options={sizeOptions}
-                                        defaultValue={selectedOption}
-                                        onSelect={handleOptionSelect}
-                                    />
-                                </View>
-                            </ThemedView>
+                                <ThemedView style={styles.subTitle}>
+                                    <ThemedText style={styles.caption}>Selectionner Taille</ThemedText>
+                                    <View style={{marginLeft: -8}}>
+                                        <CustomRadioInput
+                                            options={sizeOptions}
+                                            defaultValue={selectedOption}
+                                            onSelect={handleOptionSelect}
+                                        />
+                                    </View>
+                                </ThemedView>
 
-                            <ThemedView style={styles.controlThemedView}>
-                                <ThemedText style={styles.productDetails}>Selectionner Couleur</ThemedText>
-                                <View style={{marginLeft: -8}}>
-                                    <CustomRadioInput
-                                        options={mixedOptions}
-                                        defaultValue={selectedOption}
-                                        onSelect={handleOptionSelect}
-                                    />
-                                </View>
+                                <ThemedView style={styles.subTitle}>
+                                    <ThemedText style={styles.caption}>Selectionner Couleur</ThemedText>
+                                    <View style={{marginLeft: -8}}>
+                                        <CustomRadioInput
+                                            options={mixedOptions}
+                                            defaultValue={selectedOption}
+                                            onSelect={handleOptionSelect}
+                                        />
+                                    </View>
+                                </ThemedView>
+
+                                <ThemedView style={[styles.subTitle, styles.quantityWrapper]}>
+                                    <ThemedText style={styles.caption}>Quantity</ThemedText>
+                                    
+                                    <View style={styles.quantity}>
+                                        <QuantityControl
+                                            min={90}
+                                            max={100}
+                                            initialValue={3}
+                                            onValueChange={handleQuantityChange}
+                                            
+                                        />
+                                    </View>
+                                </ThemedView>
+
+                                <ThemedView style={styles.subTitle}>
+                                    <ThemedText style={styles.caption}>Description</ThemedText>
+                                    <ThemedText style={styles.description}>
+                                        {product.description}
+                                    </ThemedText>
+                                </ThemedView>
                             </ThemedView>
+                            </Pressable>
+                            
                         </ThemedView>
-                        
-                        
-                    </ThemedView>
+                </View>
+          )}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 190 }} // ajuste selon la tab bar
+        />
                 </ThemedView>
             </SafeAreaView>
             
@@ -137,7 +176,11 @@ export default ProductDetailsScreen;
 const createStyles = (colors : any, typography: any) =>
     StyleSheet.create({
         controlThemedView:{
-            backgroundColor: colors.background.white
+            backgroundColor: colors.background.white,
+        },
+        subTitle:{
+            backgroundColor: colors.background.white,
+            marginTop: 10
         },
         container:{
             backgroundColor : colors.background.white,
@@ -157,7 +200,7 @@ const createStyles = (colors : any, typography: any) =>
             flexDirection: 'row',
             alignItems:"flex-end",
         },
-        productDetails:{
+        caption:{
             color : colors.text.primary,
             ...typography.h3
         },
@@ -203,4 +246,15 @@ const createStyles = (colors : any, typography: any) =>
         rating: {
             fontSize: 14,
         },
+        quantityWrapper:{
+            flexDirection: 'row',
+            alignItems: "center"
+        },
+        quantity:{
+            paddingLeft: 5
+        },
+        description:{
+            ...typography.body1,
+            color: colors.text.primary
+        }
 })
