@@ -14,7 +14,7 @@ import {
 
 interface QuantityControlProps {
   min: number;
-  max: number;
+  max ?: number;
   initialValue?: number;
   onValueChange?: (value: number) => void;
   containerStyle?: ViewStyle;
@@ -22,7 +22,7 @@ interface QuantityControlProps {
 
 const QuantityControl: React.FC<QuantityControlProps> = ({
   min,
-  max,
+  max=10000000,
   initialValue = min,
   onValueChange,
   containerStyle,

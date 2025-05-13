@@ -22,6 +22,7 @@ export interface User {
     category: Category[];
     in_stock: boolean;
     stock_quantity: number;
+    has_unlimited_stock: boolean,
     declination: Declination[];
     currency: Currency;
     created_at: string;

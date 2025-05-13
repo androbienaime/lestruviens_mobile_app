@@ -13,6 +13,7 @@ import { Declination } from '../../src/@types/models';
 import CustomRadioInput from "@/components/CustomRadioInput";
 import QuantityControl from "@/components/QuantityControl";
 import { Keyboard } from "react-native";
+import RenderHTMLToText from "@/components/RenderHTMLToText";
 
 
 type Props = NativeStackScreenProps<ShopStackParamList, 'ProductDetails'>;
@@ -140,11 +141,10 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                                     
                                     <View style={styles.quantity}>
                                         <QuantityControl
-                                            min={90}
-                                            max={100}
-                                            initialValue={3}
-                                            onValueChange={handleQuantityChange}
-                                            
+                                            min={1}
+                                            {...(product.has_unlimited_stock ? { } : {max: product.stock_quantity})}
+                                            initialValue={1}
+                                            onValueChange={handleQuantityChange} 
                                         />
                                     </View>
                                 </ThemedView>
@@ -152,8 +152,14 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                                 <ThemedView style={styles.subTitle}>
                                     <ThemedText style={styles.caption}>Description</ThemedText>
                                     <ThemedText style={styles.description}>
-                                        {product.description}
+                                        {RenderHTMLToText(product.description, true)}
                                     </ThemedText>
+                                </ThemedView>
+                                
+                                <ThemedView style={styles.subTitle}>
+                                    <ThemedText style={{...typography.h4, color: colors.text.primary}}>Expedition à Gonaive, Rue parc Vincent</ThemedText>
+                                    <ThemedText style={{ ...typography.h5, color: colors.text.primary}}>Livraison estime le :</ThemedText>
+                                    <ThemedText style={{ ...typography.body1, color: colors.text.primary }}>19/05/2025 - 23/05/2025</ThemedText>
                                 </ThemedView>
                             </ThemedView>
                             </Pressable>
