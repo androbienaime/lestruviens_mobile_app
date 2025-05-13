@@ -14,6 +14,7 @@ import CustomRadioInput from "@/components/CustomRadioInput";
 import QuantityControl from "@/components/QuantityControl";
 import { Keyboard } from "react-native";
 import RenderHTMLToText from "@/components/RenderHTMLToText";
+import AccordionButton from "@/components/AccordionButton";
 
 
 type Props = NativeStackScreenProps<ShopStackParamList, 'ProductDetails'>;
@@ -160,6 +161,23 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
                                     <ThemedText style={{...typography.h4, color: colors.text.primary}}>Expedition à Gonaive, Rue parc Vincent</ThemedText>
                                     <ThemedText style={{ ...typography.h5, color: colors.text.primary}}>Livraison estime le :</ThemedText>
                                     <ThemedText style={{ ...typography.body1, color: colors.text.primary }}>19/05/2025 - 23/05/2025</ThemedText>
+                                </ThemedView>
+
+                                <ThemedView style={styles.subTitle}>
+                                    <AccordionButton
+                                        title="Details du produit"
+                                        content={
+                                            RenderHTMLToText(product.description, true)
+                                        }
+                                        />
+                                </ThemedView>
+                                <ThemedView style={styles.subTitle}>
+                                    <AccordionButton
+                                        title="Retour sous 5 jours"
+                                        content={
+                                            RenderHTMLToText(product.description, true)
+                                        }
+                                        />
                                 </ThemedView>
                             </ThemedView>
                             </Pressable>

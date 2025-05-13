@@ -2,13 +2,16 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Feather } from '@expo/vector-icons';
+import { getFocusedRouteNameFromRoute, RouteProp } from '@react-navigation/native';
+
 import { MainTabParamList } from '../src/@types/navigation';
 import ShopStackNavigator from './ShopNavigator';
 import CartStackNavigator from './CartNavigator';
 import ProfileStackNavigator from './ProfileNavigator';
 import CategoriesScreen from '@/screens/shop/CategoryScreen';
-import { useThemeColors, useTheme, useThemeTypography } from '@/theme';
 import ChatScreen from '@/screens/chat/ChatScreen';
+
+import { useThemeColors } from '@/theme';
 
 const MainTab = createBottomTabNavigator<MainTabParamList>();
 
@@ -20,17 +23,22 @@ const MainTabNavigator: React.FC = () => {
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName: keyof typeof Feather.glyphMap = 'home';
-          
-          if (route.name === 'Categories') {
-            iconName = 'grid';
-          } else if (route.name === 'Cart') {
-            iconName = 'shopping-cart';
-          } else if (route.name === 'Chat') {
-            iconName = 'message-circle';
-          }else if (route.name === 'Profile') {
-            iconName = 'user';
+
+          switch (route.name) {
+            case 'Categories':
+              iconName = 'grid';
+              break;
+            case 'Cart':
+              iconName = 'shopping-cart';
+              break;
+            case 'Chat':
+              iconName = 'message-circle';
+              break;
+            case 'Profile':
+              iconName = 'user';
+              break;
           }
-          
+
           return <Feather name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: colors.button.primary,
@@ -47,7 +55,28 @@ const MainTabNavigator: React.FC = () => {
         },
       })}
     >
-      <MainTab.Screen name="Shop" component={ShopStackNavigator} options={{ title: 'Accueil' }} />
+      <MainTab.Screen
+        name="Shop"
+        component={ShopStackNavigator}
+        options={({ route }) => {
+          // disable global tabBar for ProductDetails
+          const routeName = getFocusedRouteNameFromRoute(route as RouteProp<any>) ?? '';
+          const tabHiddenRoutes = ['ProductDetails'];
+
+          const isTabBarVisible = !tabHiddenRoutes.includes(routeName);
+
+          return {
+            title: 'Accueil',
+            tabBarStyle: isTabBarVisible
+              ? {
+                  elevation: 0,
+                  borderTopWidth: 1,
+                  borderTopColor: colors.border.default,
+                }
+              : { display: 'none' },
+          };
+        }}
+      />
       <MainTab.Screen name="Categories" component={CategoriesScreen} options={{ title: 'Catégories' }} />
       <MainTab.Screen name="Chat" component={ChatScreen} options={{ title: 'Leki' }} />
       <MainTab.Screen name="Cart" component={CartStackNavigator} options={{ title: 'Panier' }} />

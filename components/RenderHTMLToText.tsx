@@ -24,6 +24,9 @@ const openLinkSafely = (url: string) => {
 const RenderHTMLToText = (html: string, withoutBalise = false): React.ReactNode[] => {
   const elements: React.ReactNode[] = [];
 
+  if(html == null){
+    html = "";
+  }
   // Si withoutBalise, on nettoie tout sauf les liens
   if (withoutBalise) {
     // Convertir <a href="...">label</a> en juste l'URL (ou garder le texte du lien ?)

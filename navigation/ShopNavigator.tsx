@@ -33,6 +33,7 @@ const ShopStackNavigator: React.FC = () => {
         name="ProductDetails" 
         component={ProductDetailsScreen} 
         options={{ title: 'Détails du produit', headerShown: false}} 
+        
       />
       {/* <ShopStack.Screen 
         name="Search" 
