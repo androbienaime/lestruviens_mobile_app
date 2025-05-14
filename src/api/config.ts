@@ -1,6 +1,6 @@
 // Configuration de l'API
 const API_CONFIG = {
-    BASE_URL: 'http://192.168.1.14:8000/api',
+    BASE_URL: 'http://192.168.51.165:8000/api',
     TIMEOUT: 15000, // 15 secondes
     RETRY_ATTEMPTS: 3,
     HEADERS: {

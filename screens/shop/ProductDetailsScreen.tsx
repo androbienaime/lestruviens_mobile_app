@@ -47,6 +47,18 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         console.log('Option sélectionnée:', value);
       };
 
+      const handleAddToCart = () => {
+        // Implémentez votre logique d'ajout au panier ici
+        console.log('Ajout au panier:', {
+            product: product.name,
+            // quantity: quantity,
+            option: selectedOption,
+            size: selectedSize
+        });
+        // Vous pourriez naviguer vers le panier ou afficher une notification
+        // navigation.navigate('Cart', { screen: 'Cart' });
+    };
+
       const sizeOptions = [
         { value: 'S',  type: 'text' as const, content: 'S' },
         { value: 'M',  type: 'text' as const, content: 'M' },
@@ -190,6 +202,24 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         />
                 </ThemedView>
             </SafeAreaView>
+
+             {/* Bouton "Ajouter au panier" qui reste fixe en bas de l'écran */}
+             <View style={styles.addToCartButtonContainer}>
+                <View style={styles.addToCartButtonContainerWrapper}>
+                    <Ionicons name="heart-outline" size={35} color={colors.text.primary} />
+                    <Pressable 
+                        onPress={handleAddToCart}
+                        style={styles.addToCartButton}
+                    >
+                        <View style={styles.addToCartTextWrapper}>
+                            <Ionicons name="cart" size={22} color={colors.background.secondary} />
+                            <ThemedText style={styles.addToCartButtonText}>
+                                Ajouter au panier
+                            </ThemedText>
+                        </View>
+                    </Pressable>
+                </View>
+            </View>
             
         </>
     )
@@ -280,5 +310,47 @@ const createStyles = (colors : any, typography: any) =>
         description:{
             ...typography.body1,
             color: colors.text.primary
+        },
+         // Styles pour le bouton "Ajouter au panier"
+         addToCartButtonContainer: {
+            position: 'absolute', 
+            bottom: 0, 
+            left: 0, 
+            right: 0, 
+            backgroundColor: colors.background.white,
+            padding: 15,
+            paddingTop: 5,
+            paddingBottom: 30,
+            borderTopWidth: 1,
+            borderTopColor: colors.border.default,
+            elevation: 5,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+        },
+        addToCartButtonContainerWrapper:{
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: "center"
+         },
+        addToCartButton: {
+            flex: 1,
+            marginLeft: 10,
+            backgroundColor: colors.button.primary,
+            paddingVertical: 10,
+            borderRadius: 8,
+            alignItems: 'center',
+            
+        },
+        addToCartTextWrapper:{
+            flexDirection: 'row',
+            alignItems: 'center',
+        },
+        addToCartButtonText: {
+            color: "#fff",
+            fontSize: 16,
+            fontWeight: 'bold',
+            paddingHorizontal: 10
         }
 })
