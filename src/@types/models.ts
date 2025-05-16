@@ -87,13 +87,22 @@ export interface User {
     quantity: number;
     sku: string;
     declination_images?: [];
-    value : Values[];
+    values : Values[];
   }
 
   export interface Values{
     id: number;
     value: string;
     color?: string;
+    attribute: Attribute 
+  }
+
+  export interface Attribute{
+    id: number;
+    name: string;
+    type: string;
+    shop_id: string;
+    account_id: string;
   }
 
   export enum OrderStatus {

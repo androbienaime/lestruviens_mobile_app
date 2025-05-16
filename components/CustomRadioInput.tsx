@@ -7,6 +7,7 @@ interface RadioOption {
   type: 'text' | 'color' | 'image';
   content: string; // Texte pour 'text', code couleur pour 'color'
   imageSource?: ImageSourcePropType;
+  disabled?: boolean;
 }
 
 interface CustomRadioProps {
@@ -83,9 +84,15 @@ const CustomRadioInput: React.FC<CustomRadioProps> = ({
               // Pour les types couleur/image, on utilise un style rond
               (option.type === 'color' || option.type === 'image') && styles.roundRadioButton,
               selectedOption === option.value && styles.radioButtonActive,
+              option.disabled && styles.disabledOption, // 👈 désactiver le style
+
             ]}
-            onPress={() => handleSelect(option.value)}
-            activeOpacity={0.8}
+            onPress={() => {
+              if (!option.disabled) {
+                handleSelect(option.value);
+              }
+            }}
+            activeOpacity={option.disabled ? 1 : 0.8} //             activeOpacity={0.8}
           >
             {renderContent(option, selectedOption === option.value)}
           </TouchableOpacity>
@@ -150,7 +157,12 @@ const styles = StyleSheet.create({
     width: 35,
     height: 35,
     borderRadius: 17.5,
-  }
+  },
+  disabledOption: {
+    opacity: 0.3,
+    
+  },
+  
 });
 
 export default CustomRadioInput;
