@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useThemeColors, useThemeTypography } from '@/theme';
 import RenderHTMLToText from '@/components/RenderHTMLToText';
-import AccordionButton from '@/components/AccordionButton';
+import AccordionButton from '@/components/forms/AccordionButton';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 

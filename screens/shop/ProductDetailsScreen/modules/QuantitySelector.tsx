@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useThemeColors, useThemeTypography } from '@/theme';
-import QuantityControl from '@/components/QuantityControl';
+import QuantityControl from '@/components/forms/QuantityControl';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 

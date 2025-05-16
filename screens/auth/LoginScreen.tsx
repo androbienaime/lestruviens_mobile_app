@@ -1,5 +1,5 @@
-import CustomAnimated from '@/components/CustomAnimated';
-import InputField from '@/components/InputField';
+import CustomAnimated from '@/components/forms/CustomAnimated';
+import InputField from '@/components/forms/InputField';
 import { Link } from 'expo-router';
 import { navigate } from 'expo-router/build/global-state/routing';
 import React, { useState } from 'react';

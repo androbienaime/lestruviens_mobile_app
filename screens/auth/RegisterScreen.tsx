@@ -14,9 +14,9 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import CustomAnimated from '@/components/CustomAnimated';
+import CustomAnimated from '@/components/forms/CustomAnimated';
 import { ThemedView } from '@/components/ThemedView';
-import InputField from '@/components/InputField';
+import InputField from '@/components/forms/InputField';
 import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import { lightColors } from '@/theme';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import CustomRadioInput from '@/components/CustomRadioInput';
+import CustomRadioInput from '@/components/forms/CustomRadioInput';
 
 type DeclinationColorProps = {
   attributeName: string;
