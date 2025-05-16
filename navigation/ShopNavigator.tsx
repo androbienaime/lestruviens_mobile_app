@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ShopStackParamList } from '../src/@types/navigation';
 import HomeScreen from '../screens/shop/HomeScreen';
 import CategoryScreen from '../screens/shop/CategoryScreen';
-import ProductDetailsScreen from '../screens/shop/ProductDetailsScreen';
+import ProductDetailsScreen from '@/screens/shop/ProductDetailsScreen/index';
 // import SearchScreen from '../screens/shop/SearchScreen';
 
 const ShopStack = createNativeStackNavigator<ShopStackParamList>();
