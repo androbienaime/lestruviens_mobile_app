@@ -79,7 +79,11 @@ const MainTabNavigator: React.FC = () => {
       />
       <MainTab.Screen name="Categories" component={CategoriesScreen} options={{ title: 'Catégories' }} />
       <MainTab.Screen name="Chat" component={ChatScreen} options={{ title: 'Leki' }} />
-      <MainTab.Screen name="Cart" component={CartStackNavigator} options={{ title: 'Panier' }} />
+      <MainTab.Screen
+        name="Cart" 
+        component={CartStackNavigator} 
+        options={{ title: 'Panier', headerShown: false, tabBarStyle: {display: 'none'} }} 
+        />
       <MainTab.Screen name="Profile" component={ProfileStackNavigator} options={{ title: 'Profil' }} />
     </MainTab.Navigator>
   );

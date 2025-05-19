@@ -1,6 +1,7 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Product, Declination } from '@/src/@types/models';
 import useDisabledAttributeValues from '@/hooks/useDisabledAttributeValues';
+import { useCart } from '@/hooks/useCart'; // Import the enhanced useCart hook instead
 
 export default function useProductDetails(product: Product) {
     const [selectedDeclinations, setSelectedDeclinations] = useState<Record<string, string>>({});
@@ -9,6 +10,7 @@ export default function useProductDetails(product: Product) {
     const [currentPrice, setCurrentPrice] = useState<number>(product.price);
     const [currentImages, setCurrentImages] = useState<string[]>(product.images);
     const [maxQuantity, setMaxQuantity] = useState<number>(product.stock_quantity);
+    const { isProductInCart, addProductToCart } = useCart(); // Use addProductToCart from enhanced hook
 
     // Organiser les attributs et valeurs des déclinaisons
     const organizedValues = useMemo(() => {
@@ -57,8 +59,10 @@ export default function useProductDetails(product: Product) {
         const selectedAttributesCount = Object.keys(selectedDeclinations).length;
         
         // On récupère le nombre d'attributs unique dans la première déclinaison
-        const firstDecl = product.declination[0];
-        const uniqueAttrsInFirstDecl = new Set(firstDecl?.values.map(v => v.attribute.name));
+        const firstDecl = product.declination?.[0];
+        if (!firstDecl) return undefined;
+        
+        const uniqueAttrsInFirstDecl = new Set(firstDecl.values.map(v => v.attribute.name));
         const expectedAttributesCount = uniqueAttrsInFirstDecl.size;
         
         // On vérifie si tous les attributs nécessaires sont sélectionnés
@@ -67,7 +71,7 @@ export default function useProductDetails(product: Product) {
         }
 
         // Chercher la déclinaison qui correspond aux valeurs sélectionnées
-        return product.declination.find(declination => {
+        return product.declination?.find(declination => {
             // Créer un mapping des attributs de cette déclinaison
             const declinationAttrs: Record<string, string> = {};
             declination.values.forEach(v => {
@@ -108,8 +112,9 @@ export default function useProductDetails(product: Product) {
             // Si aucune déclinaison complète n'est sélectionnée, revenir aux valeurs par défaut
             setCurrentPrice(product.price);
             setCurrentImages(product.images);
+            setMaxQuantity(product.stock_quantity);
         }
-    }, [findMatchingDeclination, product.price, product.images]);
+    }, [findMatchingDeclination, product.price, product.images, product.stock_quantity]);
 
     const handleDeclinationSelect = (attributeName: string, value: string) => {
         setSelectedDeclinations((prev) => ({
@@ -147,23 +152,42 @@ export default function useProductDetails(product: Product) {
         return true;
     };
 
-    const handleAddToCart = () => {
+    // Fonction pour ajouter le produit au panier
+    const handleAddToCart = useCallback(async () => {
         if (!validateSelections()) {
-            return;
+            return;       
         }
-      
-        // Tous les champs sont valides
-        console.log('Ajout au panier:', {
-            product: product.name,
-            price: currentPrice,
-            quantity: quantity,
-            selections: selectedDeclinations,
-            matchingDeclination: findMatchingDeclination
-        });
-      
-        // Ici vous pourriez ajouter la logique pour réellement ajouter au panier
-        // navigation.navigate('Cart', { screen: 'Cart' });
-    };
+        
+        // Trouver la déclinaison correspondante à utiliser
+        const matchingDeclination = findMatchingDeclination;
+        
+        try {
+            // Utiliser la fonction améliorée d'ajout au panier 
+            const result = await addProductToCart(
+                product, 
+                quantity, 
+                matchingDeclination as Declination
+            );
+            
+            if (result.success) {
+                // Afficher une confirmation de succès
+                console.log("Succès", result.message);
+            } else {
+                // Afficher l'erreur
+                console.log("Erreur", result.message);
+            }
+        } catch (error) {
+            console.error("Erreur lors de l'ajout au panier:", error);
+            console.log("Erreur", "Impossible d'ajouter le produit au panier");
+        }
+    }, [product, quantity, findMatchingDeclination, addProductToCart, validateSelections]);
+
+    // Vérifier si le produit est déjà dans le panier avec les mêmes attributs
+    const isInCart = useMemo(() => {
+        // Pour être cohérent avec l'implémentation du useCart
+        const matchingDeclination = findMatchingDeclination as Declination | undefined;
+        return isProductInCart(product.slug, matchingDeclination);
+    }, [product.id, findMatchingDeclination, isProductInCart]);
 
     return {
         organizedValues,
@@ -178,6 +202,7 @@ export default function useProductDetails(product: Product) {
         handleDeclinationSelect,
         handleQuantityChange,
         handleAddToCart,
-        validateSelections
+        validateSelections,
+        isInCart
     };
 }

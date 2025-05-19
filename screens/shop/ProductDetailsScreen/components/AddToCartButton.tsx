@@ -3,6 +3,7 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors, useThemeTypography } from '@/theme';
 import { ThemedText } from '@/components/ThemedText';
+import { useCart } from '@/context/CartContext';
 
 type AddToCartButtonProps = {
   onAddToCart: () => void;
@@ -15,6 +16,8 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 }) => {
   const colors = useThemeColors();
   const typography = useThemeTypography();
+  const { loading } = useCart();
+
 
   const styles = StyleSheet.create({
     container: {
@@ -69,6 +72,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
         <TouchableOpacity 
           style={styles.wishlistButton}
           onPress={onAddToWishlist}
+          disabled={loading}
         >
           <Ionicons 
             name="heart-outline" 
@@ -81,6 +85,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
         <TouchableOpacity 
           style={styles.addToCartButton}
           onPress={onAddToCart}
+          disabled={loading}
         >
           <View style={styles.buttonTextWrapper}>
             <Ionicons 
@@ -89,7 +94,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
               color={colors.background.secondary} 
             />
             <ThemedText style={styles.buttonText}>
-              Ajouter au panier
+              {loading ? 'Chargement...' : 'Ajouter au panier'}
             </ThemedText>
           </View>
         </TouchableOpacity>

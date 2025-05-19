@@ -13,7 +13,8 @@ import {
     CartItem, 
     Order, 
     Address, 
-    Category 
+    Category, 
+    Declination
   } from '../src/@types/models';
   
   // Clés de stockage pour AsyncStorage/AsyncStorage
@@ -216,26 +217,19 @@ import {
     /**
      * Ajoute un article au panier
      */
-    static async addItem(product: Product, quantity: number = 1, selectedAttributes?: Record<string, string>): Promise<CartItem[]> {
+    static async addItem(product: Product, quantity: number = 1, declination?: Declination): Promise<CartItem[]> {
       const currentCart = await this.getItems();
       
-      // Recherche si le produit existe déjà avec les mêmes attributs
+      // Recherche si le produit existe déjà avec la même déclinaison
       const existingItemIndex = currentCart.findIndex(item => {
-        if (item.product_id !== product.id) return false;
+        if (item.product_slug !== product.slug) return false;
         
-        // Si pas d'attributs sélectionnés, on compare juste les IDs
-        if (!selectedAttributes && !item.selected_attributes) return true;
-        if (!selectedAttributes || !item.selected_attributes) return false;
+        // Si pas de déclinaison, on compare juste les IDs
+        if (!declination && !item.Declination) return true;
+        if (!declination || !item.Declination) return false;
         
-        // Compare les attributs sélectionnés
-        const selectedAttrsKeys = Object.keys(selectedAttributes);
-        const itemAttrsKeys = Object.keys(item.selected_attributes);
-        
-        if (selectedAttrsKeys.length !== itemAttrsKeys.length) return false;
-        
-        return selectedAttrsKeys.every(key => 
-          selectedAttributes[key] === item.selected_attributes?.[key]
-        );
+        // Compare les déclinaisons (vérifier les propriétés essentielles comme SKU)
+        return item.Declination.id === declination.id;
       });
   
       if (existingItemIndex >= 0) {
@@ -245,10 +239,10 @@ import {
         // Ajouter un nouvel article au panier
         const newCartItem: CartItem = {
           id: Date.now(), // ID temporaire jusqu'à synchronisation avec le backend
-          product_id: product.id,
+          product_slug: product.slug,
           product,
           quantity,
-          selected_attributes: selectedAttributes
+          Declination: declination
         };
         currentCart.push(newCartItem);
       }
@@ -294,13 +288,17 @@ import {
       await StorageService.setData(STORAGE_KEYS.CART, []);
     }
   
-    /**
+  
+     /**
      * Calcule le total des articles du panier
      */
     static async getTotalAmount(): Promise<number> {
       const items = await this.getItems();
       return items.reduce((total, item) => {
-        const price = item.product.discount_price ?? item.product.price;
+        // Utiliser le prix de la déclinaison si disponible, sinon le prix du produit
+        const price = item.Declination && item.Declination.price > 0
+          ? item.Declination.price
+          : (item.product.discount_price ?? item.product.price);
         return total + (price * item.quantity);
       }, 0);
     }

@@ -8,42 +8,52 @@ import { useThemeColors, useThemeTypography } from '@/theme';
 import ProductCard from "./ProductCard";
 import Skeleton from "@/components/skeletonPlaceholder";
 import { Ionicons } from "@expo/vector-icons";
+import { useProducts } from "@/context/ProductContext";
 
 type Props = {
-  refreshTrigger? : number;
+  refreshTrigger: number;
+  onLoadStart?: () => void;
+  onLoadEnd?: () => void;
 };
 
 const ProductFeatured = ({refreshTrigger, ...otherProps} : Props)=>{
-    const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);    
+    // const [products, setProducts] = useState<Product[]>([]);
+    // const [loading, setLoading] = useState(true);    
     const colors = useThemeColors();
     const typography = useThemeTypography();
 
     const styles = useMemo(() => createStyles(colors, typography), [colors, typography]);
-  
-    useEffect(() => {
-        const fetchProducts = async () => {
-          setLoading(true);
-          const productsParams = {
-            'page' : 1,
-            'per_page' : 4,
-          };
+    const {
+      products,
+      loading,
+      hasMore,
+      refreshing,
+      handleRefresh,
+      handleLoadMore,
+    } = useProducts();
+    // useEffect(() => {
+    //     const fetchProducts = async () => {
+    //       setLoading(true);
+    //       const productsParams = {
+    //         'page' : 1,
+    //         'per_page' : 4,
+    //       };
 
-          try {
-            const response = (await productsService.getProducts(productsParams));
-            if(response){
-              setProducts(response.data.sort((a, b) => a.id - b.id));
-            }
-          } catch (error) {
-            setProducts([]);
-            console.error('Erreur en récupérant les produits :', error);
-          } finally {
-            setLoading(false);
-          }
-        };
+    //       try {
+    //         const response = (await productsService.getProducts(productsParams));
+    //         if(response){
+    //           setProducts(response.data.sort((a, b) => a.id - b.id));
+    //         }
+    //       } catch (error) {
+    //         setProducts([]);
+    //         console.error('Erreur en récupérant les produits :', error);
+    //       } finally {
+    //         setLoading(false);
+    //       }
+    //     };
     
-        fetchProducts();
-      }, [refreshTrigger]);
+    //     fetchProducts();
+    //   }, [refreshTrigger]);
     
      
     
@@ -62,7 +72,7 @@ const ProductFeatured = ({refreshTrigger, ...otherProps} : Props)=>{
                     <Ionicons name="arrow-forward-outline" />
                 </Pressable>
             </View>
-            {loading ? (
+            {loading || refreshing ? (
                 <Skeleton.Products 
                   itemCount={3} 
                   isHorizontal={true}
@@ -72,7 +82,8 @@ const ProductFeatured = ({refreshTrigger, ...otherProps} : Props)=>{
                     horizontal
                     showsHorizontalScrollIndicator
                     data={products} 
-                    
+                    refreshing={refreshing}
+                    onRefresh={handleRefresh}
                     keyExtractor={(item) => item.slug.toString()}
                     renderItem={({index, item}) => 
                         <ProductCard item={item} index={index}/>

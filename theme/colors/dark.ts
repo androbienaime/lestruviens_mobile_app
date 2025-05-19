@@ -115,8 +115,10 @@ const palette = {
       secondary: '#E5E5E5',
       tertiary: '#A3A3A3',
       link: palette.primary500,
+      inverse: palette.white,
       disabled: palette.neutral400,
-
+      errror: palette.error500,
+      danger: palette.warning500
       // ... autres styles de texte
     },
     
@@ -125,7 +127,8 @@ const palette = {
       secondary: palette.secondary500,
       disabled: palette.neutral300,
       gray: palette.neutral500,
-
+      error: palette.error500,
+      warning: palette.warning500
     },
     // ... autres groupes de couleurs
   };

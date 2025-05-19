@@ -117,6 +117,8 @@ const lightColors = {
     hint: palette.neutral400,
     muted: palette.neutral500,
     link: palette.primary500,
+    error: palette.error500,
+    danger: palette.warning500
   },
 
   border: {
@@ -130,6 +132,8 @@ const lightColors = {
     secondary: palette.secondary500,
     disabled: palette.neutral300,
     gray: palette.neutral500,
+    error : palette.error500,
+    warning: palette.warning500
   },
 
   shadow: {

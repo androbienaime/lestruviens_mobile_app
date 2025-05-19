@@ -12,7 +12,7 @@ const CartStackNavigator: React.FC = () => {
   return (
     <CartStack.Navigator
       screenOptions={{
-        headerShown: true,
+        headerShown: false,
         animation: 'slide_from_right',
         headerBackVisible: false,
       }}

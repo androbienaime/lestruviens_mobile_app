@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { StyleSheet, View, ImageSourcePropType } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useThemeColors } from "@/theme";
 import { ThemedView } from "@/components/ThemedView";
@@ -9,13 +9,16 @@ import HomeSlider from "@/components/HomeSlider";
 import ProductFeatured from "@/components/modules/products/ProductFeatured";
 import Header from "@/components/Header";
 import { FlatList } from "react-native";
-
+import { LoadingProvider } from "@/context/LoadingContext";
+import LoadingOverlay from "@/components/forms/LoadingOverlay";
+import { ProductProvider } from "@/context/ProductContext";
 
 const HomeScreen = () => {
   const colors = useThemeColors();
 
   const [refreshing, setRefreshing] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [globalLoading, setGlobalLoading] = useState(false);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -27,39 +30,64 @@ const HomeScreen = () => {
     }, 500);
   }, []);
   
+  // Méthodes pour contrôler l'overlay de chargement global
+  const showGlobalLoading = useCallback(() => {
+    setGlobalLoading(true);
+  }, []);
+
+  const hideGlobalLoading = useCallback(() => {
+    setGlobalLoading(false);
+  }, []);
+  
   return (
-    <SafeAreaView style={{ backgroundColor: colors.background.primary, flex: 1 }}>
-      <ThemedView>
-        <Header />
-        <CategoriesList />
-        <FlatList
-          data={[1]} // dummy item
-          keyExtractor={() => "home-section"}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          renderItem={() => (
-            <View>
-              <ProductFeatured refreshTrigger={refreshTrigger}/>
-              <ProductList refreshTrigger={refreshTrigger} initialLimit={6}/>
-            </View>
-          )}
-          ListHeaderComponent={() => (
-            <View>
-              <HomeSlider style={{ marginLeft: 18 }} />
-            </View>
-          )}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 190 }} // ajuste selon la tab bar
-        />
-      </ThemedView>
-    </SafeAreaView>
+    <LoadingProvider>
+      <SafeAreaView style={{ backgroundColor: colors.background.primary, flex: 1 }}>
+        <ThemedView>
+          <Header />
+          <CategoriesList />
+          <ProductProvider initialLimit={6}>
+            <FlatList
+              data={[1]} // dummy item
+              keyExtractor={() => "home-section"}
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              renderItem={() => (
+                <View>
+                  <ProductFeatured 
+                    refreshTrigger={refreshTrigger}
+                    onLoadStart={showGlobalLoading}
+                    onLoadEnd={hideGlobalLoading}
+                  />
+                  <ProductList 
+                    refreshTrigger={refreshTrigger} 
+                    // onLoadStart={showGlobalLoading}
+                    // onLoadEnd={hideGlobalLoading}
+                    globalRefreshing={refreshing}
+                  />
+                </View>
+              )}
+              ListHeaderComponent={() => (
+                <View>
+                  <HomeSlider style={{ marginLeft: 18 }} />
+                </View>
+              )}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 190 }} // ajuste selon la tab bar
+            />
+          </ProductProvider>
+          
+          {/* Overlay de chargement global */}
+          {/* <LoadingOverlay visible={globalLoading} /> */}
+        </ThemedView>
+      </SafeAreaView>
+    </LoadingProvider>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 18,
-  },
+  }
 });
 
 export default HomeScreen;

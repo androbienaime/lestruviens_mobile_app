@@ -1,91 +1,174 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { CartStorage } from '@/utils/storage';
+import { CartItem, Declination, Product } from '@/src/@types/models';
 
-type CartItem = {
-  id: string;
-  productId: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-};
-
+// Définition du type pour le contexte du panier
 type CartContextType = {
-  items: CartItem[];
-  addItem: (item: CartItem) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
-  clearCart: () => void;
-  totalItems: number;
-  totalPrice: number;
+  cartItems: CartItem[];
+  itemCount: number;
+  totalAmount: number;
+  loading: boolean;
+  addToCart: (product: Product, quantity: number, declination?: Declination) => Promise<void>;
+  updateQuantity: (cartItemId: number, quantity: number) => Promise<void>;
+  removeItem: (cartItemId: number) => Promise<void>;
+  clearCart: () => Promise<void>;
+  isProductInCart: (productSlug: string, declination?: Declination) => boolean;
 };
 
-const CartContext = createContext<CartContextType>({
-  items: [],
-  addItem: () => {},
-  removeItem: () => {},
-  updateQuantity: () => {},
-  clearCart: () => {},
-  totalItems: 0,
-  totalPrice: 0,
-});
+// Création du contexte avec une valeur par défaut undefined
+const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export const useCart = () => useContext(CartContext);
+// Props pour le Provider
+type CartProviderProps = {
+  children: ReactNode;
+};
 
-export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
+export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [itemCount, setItemCount] = useState<number>(0);
+  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const addItem = (item: CartItem) => {
-    setItems(currentItems => {
-      const existingItem = currentItems.find(i => i.productId === item.productId);
+  // Charger les données du panier au démarrage
+  useEffect(() => {
+    loadCartData();
+  }, []);
+
+  // Fonction pour charger les données du panier
+  const loadCartData = async () => {
+    setLoading(true);
+    try {
+      const items = await CartStorage.getItems();
+      const count = await CartStorage.getItemCount();
+      const amount = await CartStorage.getTotalAmount();
       
-      if (existingItem) {
-        return currentItems.map(i => 
-          i.productId === item.productId 
-            ? { ...i, quantity: i.quantity + item.quantity } 
-            : i
-        );
-      }
+      setCartItems(items);
+      setItemCount(count);
+      setTotalAmount(amount);
+    } catch (error) {
+      console.error("Erreur lors du chargement du panier:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Ajouter un produit au panier
+  const addToCart = async (
+    product: Product, 
+    quantity: number, 
+    declination?: Declination
+  ) => {
+    setLoading(true);
+    try {
+      const updatedCart = await CartStorage.addItem(product, quantity, declination);
+      setCartItems(updatedCart);
       
-      return [...currentItems, item];
+      // Mettre à jour le compteur et le total
+      const newCount = await CartStorage.getItemCount();
+      const newAmount = await CartStorage.getTotalAmount();
+      
+      setItemCount(newCount);
+      setTotalAmount(newAmount);
+    } catch (error) {
+      console.error("Erreur lors de l'ajout au panier:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mettre à jour la quantité d'un article
+  const updateQuantity = async (cartItemId: number, quantity: number) => {
+    setLoading(true);
+    try {
+      const updatedCart = await CartStorage.updateQuantity(cartItemId, quantity);
+      setCartItems(updatedCart);
+      
+      // Mettre à jour le compteur et le total
+      const newCount = await CartStorage.getItemCount();
+      const newAmount = await CartStorage.getTotalAmount();
+      
+      setItemCount(newCount);
+      setTotalAmount(newAmount);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la quantité:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Supprimer un article du panier
+  const removeItem = async (cartItemId: number) => {
+    setLoading(true);
+    try {
+      const updatedCart = await CartStorage.removeItem(cartItemId);
+      setCartItems(updatedCart);
+      
+      // Mettre à jour le compteur et le total
+      const newCount = await CartStorage.getItemCount();
+      const newAmount = await CartStorage.getTotalAmount();
+      
+      setItemCount(newCount);
+      setTotalAmount(newAmount);
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'article:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Vider le panier
+  const clearCart = async () => {
+    setLoading(true);
+    try {
+      await CartStorage.clearCart();
+      setCartItems([]);
+      setItemCount(0);
+      setTotalAmount(0);
+    } catch (error) {
+      console.error("Erreur lors de la suppression du panier:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Vérifier si un produit est déjà dans le panier
+  const isProductInCart = (productSlug: string, declination?: Declination): boolean => {
+    return cartItems.some(item => {
+      if (item.product_slug !== productSlug) return false;
+      
+      // Si pas de déclinaison, on compare juste les IDs
+      if (!declination && !item.Declination) return true;
+      if (!declination || !item.Declination) return false;
+      
+      // Compare les déclinaisons (vérifier les propriétés essentielles comme SKU)
+      return item.Declination.sku === declination.sku;
     });
   };
 
-  const removeItem = (id: string) => {
-    setItems(currentItems => currentItems.filter(item => item.id !== id));
+  const value = {
+    cartItems,
+    itemCount,
+    totalAmount,
+    loading,
+    addToCart,
+    updateQuantity,
+    removeItem,
+    clearCart,
+    isProductInCart
   };
-
-  const updateQuantity = (id: string, quantity: number) => {
-    setItems(currentItems => 
-      currentItems.map(item => 
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const clearCart = () => {
-    setItems([]);
-  };
-
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  
-  const totalPrice = items.reduce(
-    (sum, item) => sum + item.price * item.quantity, 
-    0
-  );
 
   return (
-    <CartContext.Provider
-      value={{
-        items,
-        addItem,
-        removeItem,
-        updateQuantity,
-        clearCart,
-        totalItems,
-        totalPrice,
-      }}
-    >
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   );
+};
+
+// Hook personnalisé pour utiliser le contexte du panier
+export const useCart = (): CartContextType => {
+  const context = useContext(CartContext);
+  if (context === undefined) {
+    throw new Error('useCart must be used within a CartProvider');
+  }
+  return context;
 };

@@ -46,10 +46,11 @@ export interface User {
   
   export interface CartItem {
     id: number;
-    product_id: number;
+    product_slug: string;
     product: Product;
     quantity: number;
     selected_attributes?: Record<string, string>;
+    Declination?: Declination
   }
   
   export interface Order {
@@ -83,6 +84,7 @@ export interface User {
   }
 
   export interface Declination{
+    id: number;
     price: number;
     quantity: number;
     sku: string;
