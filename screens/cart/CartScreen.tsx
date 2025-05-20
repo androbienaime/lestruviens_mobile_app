@@ -18,24 +18,27 @@ import CartItem from "@/components/modules/cart/CartItem";
 import { useCart } from "@/context/CartContext";
 import { Ionicons } from "@expo/vector-icons";
 import CartSummary from "@/components/modules/cart/CartSummary";
-// import { ShoppingBag } from "lucide-react-native";
 
 type CartScreenProps = {
   navigation: NativeStackNavigationProp<any>;
 };
 
 const CartScreen = ({ navigation }: CartScreenProps) => {
-  const { cartItems, itemCount, totalAmount, loading, clearCart } = useCart();
+  const { cartItems, itemCount, totalAmount, loading, clearCart, removeItem } = useCart();
   const colors = useThemeColors();
   const typography = useThemeTypography();
   const [refreshing, setRefreshing] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   // Rafraîchir le panier quand l'écran devient actif
   useFocusEffect(
     React.useCallback(() => {
-      // Si nécessaire, vous pourriez ajouter une logique de rafraîchissement ici
+      // Réinitialiser le mode de sélection lors de la navigation
+      setSelectionMode(false);
+      setSelectedItems([]);
       return () => {};
     }, [])
   );
@@ -44,7 +47,6 @@ const CartScreen = ({ navigation }: CartScreenProps) => {
   const handleRefresh = async () => {
     setRefreshing(true);
     // Le contexte de panier met déjà à jour les données automatiquement
-    // donc nous simulons juste le rafraîchissement ici
     setTimeout(() => {
       setRefreshing(false);
     }, 800);
@@ -71,16 +73,79 @@ const CartScreen = ({ navigation }: CartScreenProps) => {
         { 
           text: "Vider", 
           style: "destructive",
-          onPress: () => clearCart()
+          onPress: () => {
+            clearCart();
+            setSelectionMode(false);
+            setSelectedItems([]);
+          }
         }
       ]
     );
   };
 
+  // Activer/désactiver le mode de sélection
+  const toggleSelectionMode = () => {
+    setSelectionMode(!selectionMode);
+    setSelectedItems([]);
+  };
+
+  // Sélectionner/désélectionner un élément
+  const toggleItemSelection = (itemId: string) => {
+    if (selectedItems.includes(itemId)) {
+      setSelectedItems(selectedItems.filter(id => id !== itemId));
+    } else {
+      setSelectedItems([...selectedItems, itemId]);
+    }
+  };
+
+  // Sélectionner tous les éléments
+  const selectAllItems = () => {
+    if (selectedItems.length === cartItems.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(cartItems.map(item => item.id.toString()));
+    }
+  };
+
+  // Supprimer les éléments sélectionnés
+  const removeSelectedItems = async () => {
+    if (selectedItems.length === 0) return;
+    
+    Alert.alert(
+      "Supprimer les éléments",
+      `Êtes-vous sûr de vouloir supprimer ${selectedItems.length} élément(s) sélectionné(s) ?`,
+      [
+        { text: "Annuler", style: "cancel" },
+        { 
+          text: "Supprimer", 
+          style: "destructive",
+          onPress: async () => {
+            // Supprimer chaque élément sélectionné
+            for (const itemId of selectedItems) {
+              await removeItem(parseInt(""+itemId));
+            }
+            
+            setSelectedItems([]);
+            // Désactiver le mode de sélection s'il ne reste plus d'articles
+            if (cartItems.length - selectedItems.length <= 0) {
+              setSelectionMode(false);
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  // Partager le panier
+  const shareCart = () => {
+    navigation.navigate("ShareCart", { 
+      selectedItems: selectionMode ? selectedItems : cartItems.map(item => item.id.toString()) 
+    });
+  };
+
   // Rendu du panier vide
   const renderEmptyCart = () => (
     <View style={styles.emptyContainer}>
-      {/* <ShoppingBag size={80} color={colors.text.secondary} /> */}
       <Ionicons name="cart" size={80} color={colors.text.secondary} />
       <Text style={[styles.emptyTitle, typography.h3]}>Votre panier est vide</Text>
       <Text style={[styles.emptyText, typography.body1, { color: colors.text.secondary }]}>
@@ -90,7 +155,7 @@ const CartScreen = ({ navigation }: CartScreenProps) => {
         style={[styles.shopButton, { backgroundColor: colors.button.primary }]}
         onPress={() => navigation.navigate("Shop")}
       >
-        <Text style={[styles.shopButtonText, typography.h3, { color: colors.text.primary }]}>
+        <Text style={[styles.shopButtonText, typography.h3, { color: colors.text.inverse }]}>
           Découvrir les produits
         </Text>
       </TouchableOpacity>
@@ -101,7 +166,6 @@ const CartScreen = ({ navigation }: CartScreenProps) => {
   if (loading && !refreshing) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
-        {/* <Header title="Mon Panier" previousButton={true} /> */}
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.button.primary} />
         </View>
@@ -112,26 +176,70 @@ const CartScreen = ({ navigation }: CartScreenProps) => {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background.white }]}>
       <ThemedView style={styles.container}>
-      <Header 
-            previousButton={true}
-
-            backgroundColor={colors.background.white} 
-            inputBackground={colors.background.primary} 
-            style={styles.header}
-          />
-          {/* {
-            cartItems.length > 0 && (
-              <TouchableOpacity onPress={handleClearCart}>
-                <Text style={{ color: colors.text.tertiary }}>Vider</Text>
-              </TouchableOpacity>
-            )
-          } */}
-      
+        <Header 
+          previousButton={true}
+          hideSearchBar={true}
+          hideFilterIcon={true}
+          hideWishlistIcon={true}
+          title="Panier"
+          backgroundColor={colors.background.white} 
+          inputBackground={colors.background.primary} 
+          style={styles.header}
+          rightComponent={
+            cartItems.length > 0 ? (
+              <View style={styles.headerActions}>
+                {selectionMode ? (
+                  <>
+                    <TouchableOpacity 
+                      style={styles.headerButton} 
+                      onPress={selectAllItems}
+                    >
+                      <Text style={{ color: colors.text.tertiary }}>
+                        {selectedItems.length === cartItems.length ? "Désélectionner tout" : "Tout sélectionner"}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      style={styles.headerButton} 
+                      onPress={removeSelectedItems}
+                      disabled={selectedItems.length === 0}
+                    >
+                      <Text style={{ color: selectedItems.length > 0 ? colors.text.danger : colors.text.disabled }}>
+                        Supprimer ({selectedItems.length})
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <>
+                    <TouchableOpacity 
+                      style={styles.headerButton} 
+                      onPress={shareCart}
+                    >
+                      <Ionicons name="share-outline" size={24} color={colors.text.tertiary} />
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      style={styles.headerButton} 
+                      onPress={toggleSelectionMode}
+                    >
+                      <Ionicons name="checkbox-outline" size={24} color={colors.text.tertiary} />
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+            ) : null
+          }
+        />
 
         <FlatList
           data={cartItems}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <CartItem item={item} />}
+          renderItem={({ item }) => (
+            <CartItem 
+              item={item} 
+              selectionMode={selectionMode}
+              isSelected={selectedItems.includes(item.id.toString())}
+              onToggleSelection={() => toggleItemSelection(item.id.toString())}
+            />
+          )}
           ListEmptyComponent={renderEmptyCart}
           contentContainerStyle={cartItems.length === 0 ? { flex: 1 } : styles.listContent}
           refreshing={refreshing}
@@ -139,11 +247,40 @@ const CartScreen = ({ navigation }: CartScreenProps) => {
         />
 
         {cartItems.length > 0 && (
-          <CartSummary 
-            totalAmount = {totalAmount}
-            itemCount = {itemCount}
-            handleCheckout={handleCheckout}
-          />
+          <View>
+            {selectionMode && (
+              <View style={styles.selectionActionsContainer}>
+                <TouchableOpacity 
+                  style={[
+                    styles.selectionActionButton, 
+                    { backgroundColor: colors.button.secondary }
+                  ]} 
+                  onPress={toggleSelectionMode}
+                >
+                  <Text style={{ color: colors.text.tertiary }}>Annuler</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[
+                    styles.selectionActionButton, 
+                    { 
+                      backgroundColor: selectedItems.length > 0 ? colors.button.error : colors.button.disabled 
+                    }
+                  ]} 
+                  onPress={removeSelectedItems}
+                  disabled={selectedItems.length === 0}
+                >
+                  <Text style={{ color: colors.text.primary }}>
+                    Supprimer ({selectedItems.length})
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            <CartSummary 
+              totalAmount={totalAmount}
+              itemCount={itemCount}
+              handleCheckout={handleCheckout}
+            />
+          </View>
         )}
       </ThemedView>
     </SafeAreaView>
@@ -155,13 +292,19 @@ StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-
   },
-  header:{
+  header: {
     width: "100%",
     borderBottomWidth: 2,
     borderBottomColor: colors.background.primary
-    
+  },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerButton: {
+    marginLeft: 16,
+    padding: 4,
   },
   loadingContainer: {
     flex: 1,
@@ -194,6 +337,20 @@ StyleSheet.create({
   shopButtonText: {
     fontSize: 16,
   },
+  selectionActionsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#EEEEEE",
+  },
+  selectionActionButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginHorizontal: 4,
+  },
   summaryContainer: {
     padding: 16,
     borderTopWidth: 1,
@@ -207,7 +364,6 @@ StyleSheet.create({
   summaryRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    // marginBottom: 12,
   },
   totalRow: {
     marginTop: 8,

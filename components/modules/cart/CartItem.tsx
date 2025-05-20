@@ -2,21 +2,29 @@ import React, { useMemo, useState } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { CartItem as CartItemType } from "@/src/@types/models";
 import { useCart } from "@/context/CartContext";
-// import { Trash2, Plus, Minus } from "lucide-react-native";
 import { useThemeColors, useThemeTypography } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
 
 type Props = {
   item: CartItemType;
+  selectionMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelection?: () => void;
 };
 
-const CartItem = ({ item }: Props) => {
+const CartItem = ({ 
+  item, 
+  selectionMode = false, 
+  isSelected = false, 
+  onToggleSelection = () => {}
+}: Props) => {
   const { updateQuantity, removeItem } = useCart();
   const colors = useThemeColors();
   const typography = useThemeTypography();
   const [isUpdating, setIsUpdating] = useState(false);
 
   const styles = useMemo(() => createStyles(colors), [colors]);
+  
   // Gérer le changement de quantité
   const handleQuantityChange = async (newQuantity: number) => {
     if (newQuantity < 1) return;
@@ -46,8 +54,8 @@ const CartItem = ({ item }: Props) => {
     }
   };
 
-   // Formater les attributs sélectionnés pour l'affichage
-   const renderSelectedAttributes = () => {
+  // Formater les attributs sélectionnés pour l'affichage
+  const renderSelectedAttributes = () => {
     // Si une déclinaison est présente, on affiche ses valeurs
     if (item.Declination?.values && item.Declination.values.length > 0) {
       return (
@@ -77,87 +85,147 @@ const CartItem = ({ item }: Props) => {
     return null;
   };
 
-   // Calculer le prix total pour cet article
-   const itemPrice = item.Declination  && item.Declination.price > 0
-   ? item.Declination.price 
-   : (item.product.discount_price || item.product.price);
-    const totalPrice = itemPrice * item.quantity;
-    const currencySymbol = item.product.currency?.symbol || "$";
+  // Calculer le prix total pour cet article
+  const itemPrice = item.Declination && item.Declination.price > 0
+    ? item.Declination.price 
+    : (item.product.discount_price || item.product.price);
+  const totalPrice = itemPrice * item.quantity;
+  const currencySymbol = item.product.currency?.symbol || "$";
 
-    // Déterminer quelle image afficher (déclinaison ou produit)
-    const imageToDisplay = useMemo(() => {
-      // Vérifier si la déclinaison existe et a des images spécifiques
-      if (item.Declination?.declination_images && item.Declination.declination_images.length > 0) {
-        return (item.Declination.declination_images as string[])[0];
-      }
-      // Sinon, utiliser l'image du produit
-      return item.product.images[0];
-    }, [item.Declination, item.product.images]);
+  // Déterminer quelle image afficher (déclinaison ou produit)
+  const imageToDisplay = useMemo(() => {
+    // Vérifier si la déclinaison existe et a des images spécifiques
+    if (item.Declination?.declination_images && item.Declination.declination_images.length > 0) {
+      return (item.Declination.declination_images as string[])[0];
+    }
+    // Sinon, utiliser l'image du produit
+    return item.product.images[0];
+  }, [item.Declination, item.product.images]);
 
   return (
-    <View style={styles.container}>
-      {/* Image du produit */}
-      <Image
-        source={{ uri: imageToDisplay }}
-        style={styles.image}
-        defaultSource={require("@/assets/images/placeholder-image.png")}
-      />
-
-      <View style={styles.contentContainer}>
-        {/* Détails du produit */}
-        <View style={styles.detailsContainer}>
-          <Text style={[styles.productName, typography.body1]}>{item.product.name}</Text>
-          {renderSelectedAttributes()}
-          <Text style={[styles.priceText, typography.h3]}>
-            {currencySymbol} {itemPrice}
-          </Text>
-        </View>
-
-        {/* Contrôles de quantité et suppression */}
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity
-            onPress={handleRemove}
-            style={[styles.deleteButton, { backgroundColor: colors.background.secondary }]}
-            disabled={isUpdating}
+    <TouchableOpacity 
+      style={[
+        styles.container,
+        selectionMode && isSelected && { backgroundColor: colors.background.primary }
+      ]}
+      onPress={selectionMode ? onToggleSelection : undefined}
+      disabled={!selectionMode}
+      activeOpacity={selectionMode ? 0.7 : 1}
+    >
+      <View style={styles.mainContent}>
+        {/* Checkbox de sélection (visible uniquement en mode sélection) */}
+        {selectionMode && (
+          <TouchableOpacity 
+            style={styles.checkboxContainer}
+            onPress={onToggleSelection}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Ionicons name="trash" size={18} color={colors.button.error} />
+            <View style={[
+              styles.checkbox, 
+              { 
+                borderColor: colors.button.primary,
+                backgroundColor: isSelected ? colors.button.primary : 'transparent' 
+              }
+            ]}>
+              {isSelected && (
+                <Ionicons name="checkmark" size={16} color="#FFFFFF" />
+              )}
+            </View>
           </TouchableOpacity>
+        )}
 
-          <View style={styles.quantityContainer}>
-            <TouchableOpacity
-              onPress={() => handleQuantityChange(item.quantity - 1)}
-              style={[styles.quantityButton, { backgroundColor: colors.background.primary }]}
-              disabled={isUpdating || item.quantity <= 1}
-            >
-              <Ionicons name="remove" size={16} color={colors.text.primary} />
-            </TouchableOpacity>
+        {/* Image du produit */}
+        <Image
+          source={{ uri: imageToDisplay }}
+          style={[
+            styles.image,
+            selectionMode && { marginLeft: 8 }
+          ]}
+          defaultSource={require("@/assets/images/placeholder-image.png")}
+        />
 
-            <Text style={[styles.quantityText, typography.body1]}>{item.quantity}</Text>
-
-            <TouchableOpacity
-              onPress={() => handleQuantityChange(item.quantity + 1)}
-              style={[styles.quantityButton, { backgroundColor: colors.background.secondary }]}
-              disabled={isUpdating || (!item.product.has_unlimited_stock && item.quantity >= item.product.stock_quantity)}
-            >
-                <Ionicons name="add" size={16} color={colors.text.primary} />
-                </TouchableOpacity>
+        <View style={styles.contentContainer}>
+          {/* Détails du produit */}
+          <View style={styles.detailsContainer}>
+            <Text style={[styles.productName, typography.body1]}>{item.product.name}</Text>
+            {renderSelectedAttributes()}
+            <Text style={[styles.priceText, typography.h3]}>
+              {currencySymbol} {itemPrice}
+            </Text>
           </View>
+
+          {/* Contrôles de quantité et suppression */}
+          {!selectionMode && (
+            <View style={styles.actionsContainer}>
+              <TouchableOpacity
+                onPress={handleRemove}
+                style={[styles.deleteButton, { backgroundColor: colors.background.secondary }]}
+                disabled={isUpdating}
+              >
+                <Ionicons name="trash" size={18} color={colors.button.error} />
+              </TouchableOpacity>
+
+              <View style={styles.quantityContainer}>
+                <TouchableOpacity
+                  onPress={() => handleQuantityChange(item.quantity - 1)}
+                  style={[styles.quantityButton, { backgroundColor: colors.background.primary }]}
+                  disabled={isUpdating || item.quantity <= 1}
+                >
+                  <Ionicons name="remove" size={16} color={colors.text.primary} />
+                </TouchableOpacity>
+
+                <Text style={[styles.quantityText, typography.body1]}>{item.quantity}</Text>
+
+                <TouchableOpacity
+                  onPress={() => handleQuantityChange(item.quantity + 1)}
+                  style={[styles.quantityButton, { backgroundColor: colors.background.secondary }]}
+                  disabled={isUpdating || (!item.product.has_unlimited_stock && item.quantity >= item.product.stock_quantity)}
+                >
+                  <Ionicons name="add" size={16} color={colors.text.primary} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {/* Information de quantité simplifiée en mode sélection */}
+          {selectionMode && (
+            <View style={styles.selectionModeQuantity}>
+              <Text style={[typography.body2, { color: colors.text.secondary }]}>
+                Quantité: {item.quantity}
+              </Text>
+              <Text style={[typography.body1, { fontWeight: 'bold' }]}>
+                {currencySymbol} {totalPrice.toFixed(2)}
+              </Text>
+            </View>
+          )}
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
 const createStyles = (colors: any) =>
 StyleSheet.create({
   container: {
-    flexDirection: "row",
     padding: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.background.primary,
-    // borderTopWidth: 1,
-    // borderTopColor: colors.background.primary,
     backgroundColor: colors.background.white,
+  },
+  mainContent: {
+    flexDirection: "row",
+  },
+  checkboxContainer: {
+    justifyContent: "center",
+    paddingRight: 8,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   image: {
     width: 80,
@@ -215,6 +283,12 @@ StyleSheet.create({
     marginHorizontal: 12,
     fontSize: 16,
   },
+  selectionModeQuantity: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+  }
 });
 
 export default CartItem;

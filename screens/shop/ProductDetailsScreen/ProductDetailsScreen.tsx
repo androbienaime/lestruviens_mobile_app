@@ -69,6 +69,8 @@ const ProductDetailsScreen: React.FC<Props> = ({ route, navigation }) => {
         <ThemedView style={styles.controlThemedView}>
           <Header 
             previousButton={true}
+            hideFilterIcon={true}
+            hideCartIcon={false}
             backgroundColor={colors.background.white} 
             inputBackground={colors.background.primary} 
           />

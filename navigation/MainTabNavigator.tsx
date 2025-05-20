@@ -12,11 +12,13 @@ import CategoriesScreen from '@/screens/shop/CategoryScreen';
 import ChatScreen from '@/screens/chat/ChatScreen';
 
 import { useThemeColors } from '@/theme';
+import useCart from '@/hooks/useCart';
 
 const MainTab = createBottomTabNavigator<MainTabParamList>();
 
 const MainTabNavigator: React.FC = () => {
   const colors = useThemeColors();
+  const {itemCount } = useCart();
 
   return (
     <MainTab.Navigator
@@ -82,7 +84,15 @@ const MainTabNavigator: React.FC = () => {
       <MainTab.Screen
         name="Cart" 
         component={CartStackNavigator} 
-        options={{ title: 'Panier', headerShown: false, tabBarStyle: {display: 'none'} }} 
+        options={{ 
+          title: 'Panier', 
+          headerShown: false, 
+          tabBarBadge: itemCount > 0 ? itemCount : undefined,
+          tabBarBadgeStyle: {
+            backgroundColor: colors.button.primary,
+            color: 'white',
+          }
+        }} 
         />
       <MainTab.Screen name="Profile" component={ProfileStackNavigator} options={{ title: 'Profil' }} />
     </MainTab.Navigator>

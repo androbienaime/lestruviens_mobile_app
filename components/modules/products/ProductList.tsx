@@ -56,12 +56,12 @@ const ProductList = ({
             {/* <ActivityIndicator size="small" color={colors.button.primary} /> */}
           </ThemedView>
           {/* {loading && ( */}
-            <ThemedView>
+            {/* <ThemedView> */}
               <Skeleton.Products 
                 itemCount={2}
                 isHorizontal={false}
               />
-            </ThemedView>
+            {/* </ThemedView> */}
           {/* )} */}
         </>
       );
