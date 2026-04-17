@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../src/@types/navigation';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import OrderHistoryScreen from '../screens/profile/OrderHistoryScreen';
+import AccountManagementScreen from '../screens/profile/AccountManagementScreen';
+import LoginScreen from '@/screens/auth/LoginScreen';
 // import OrderDetailsScreen from '../screens/profile/OrderDetailsScreen';
 // import EditProfileScreen from '../screens/profile/EditProfileScreen';
 // import AddressBookScreen from '../screens/profile/AddressBookScreen';
@@ -24,7 +26,7 @@ const ProfileStackNavigator: React.FC = () => {
       }}
     >
       <ProfileStack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Mon Profil' }} />
-      <ProfileStack.Screen name="OrderHistory" component={OrderHistoryScreen} options={{ title: 'Historique des commandes' }} />
+      <ProfileStack.Screen name="AccountManagement" component={AccountManagementScreen} options={{ title: 'Gestion des comptes' }} />
       {/* <ProfileStack.Screen 
         name="OrderDetails" 
         component={OrderDetailsScreen} 

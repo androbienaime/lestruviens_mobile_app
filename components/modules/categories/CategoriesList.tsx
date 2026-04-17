@@ -29,7 +29,7 @@ const CategoriesList = ({refreshTrigger, ...otherProps} : Props) => {
       try{
         const response = (await categoriesService.getCategories());
         if(response){
-          setCategories(response.data);
+            setCategories(response);
         }
       }catch(error){
         setCategories([]);
@@ -60,20 +60,25 @@ const CategoriesList = ({refreshTrigger, ...otherProps} : Props) => {
             itemTextWidth={60}
           />
         ) : (
-          <FlatList
-              data={categories} 
-              horizontal
-              showsHorizontalScrollIndicator
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({index, item}) => 
-                <Pressable>
-                  <ThemedView style={styles.item}>
-                      <Image source={{ uri: item.coverImage }} style={styles.itemImg} />
-                      <ThemedText style={{ color: colors.text.primary }}>{item.name}</ThemedText>
-                  </ThemedView>
-                </Pressable>
-              } 
-          />
+
+          categories.length != 0 ? (
+            <FlatList
+                data={categories} 
+                horizontal
+                showsHorizontalScrollIndicator
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({index, item}) => 
+                  <Pressable>
+                    <ThemedView style={styles.item}>
+                        <Image source={{ uri: item.coverImage }} style={styles.itemImg} />
+                        <ThemedText style={{ color: colors.text.primary }}>{item.name}</ThemedText>
+                    </ThemedView>
+                  </Pressable>
+                } 
+            />
+          ) : (
+            <ThemedText style={{ color: colors.text.primary, textAlign: "center" }}>No categories found.</ThemedText>
+          )
         )}
       </ThemedView>
 

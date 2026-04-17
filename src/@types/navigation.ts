@@ -40,6 +40,7 @@ export type CartStackParamList = {
 export type ProfileStackParamList = {
   Profile: undefined;
   OrderHistory: undefined;
+  AccountManagement: undefined;
   OrderDetails: {
     orderId: string;
   };

@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useThemeColors } from "@/theme";
 import { ThemedView } from "@/components/ThemedView";
 import ProductList from "@/components/modules/products/ProductList";
@@ -13,7 +14,13 @@ import { LoadingProvider } from "@/context/LoadingContext";
 import LoadingOverlay from "@/components/forms/LoadingOverlay";
 import { ProductProvider } from "@/context/ProductContext";
 
+//  export const resetStorage = async () => {
+//   await AsyncStorage.clear();
+//   console.log('Storage reset: all data cleared.');
+//   };
+
 const HomeScreen = () => {
+//  resetStorage(); // 🔥 Supprimer ou commenter après test
   const colors = useThemeColors();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -68,7 +75,7 @@ const HomeScreen = () => {
               )}
               ListHeaderComponent={() => (
                 <View>
-                  <HomeSlider style={{ marginLeft: 18 }} />
+                   <HomeSlider style={{ marginLeft: 18 }} /> 
                 </View>
               )}
               showsVerticalScrollIndicator={false}
@@ -78,6 +85,7 @@ const HomeScreen = () => {
           
           {/* Overlay de chargement global */}
           {/* <LoadingOverlay visible={globalLoading} /> */}
+          
         </ThemedView>
       </SafeAreaView>
     </LoadingProvider>

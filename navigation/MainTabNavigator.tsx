@@ -9,7 +9,7 @@ import ShopStackNavigator from './ShopNavigator';
 import CartStackNavigator from './CartNavigator';
 import ProfileStackNavigator from './ProfileNavigator';
 import CategoriesScreen from '@/screens/shop/CategoryScreen';
-import ChatScreen from '@/screens/chat/ChatScreen';
+// import ChatScreen from '@/screens/chat/ChatScreen';
 
 import { useThemeColors } from '@/theme';
 import useCart from '@/hooks/useCart';
@@ -80,7 +80,7 @@ const MainTabNavigator: React.FC = () => {
         }}
       />
       <MainTab.Screen name="Categories" component={CategoriesScreen} options={{ title: 'Catégories' }} />
-      <MainTab.Screen name="Chat" component={ChatScreen} options={{ title: 'Leki' }} />
+      {/* <MainTab.Screen name="Chat" component={ChatScreen} options={{ title: 'Leki' }} /> */}
       <MainTab.Screen
         name="Cart" 
         component={CartStackNavigator} 

@@ -1,43 +1,40 @@
 // context/AuthContext.tsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useMultiAccount } from '@/context/MultiAccountContext';
+import { AccountUser, MultiAccountStorage, SavedAccount } from '@/utils/multiAccountStorage';
+import { authService } from '@/src/api/services/auth.service';
+import { storage } from '@/utils/storage';
 
-// Types pour l'authentification
-type User = {
-  id: string;
-  email: string;
-  name: string;
-  phone?: string;
-  avatar?: string;
-};
+// ─── Types ────────────────────────────────────────────────────────────────────
 
-type AuthState = {
-  user: User | null;
-  token: string | null;
-  isLoading: boolean;
-  error: string | null;
+// type User = {
+//   id: string;
+//   email: string;
+//   name: string;
+//   phone?: string;
+//   avatar?: string;
+// };
+
+export type LoginOptions = {
+  saveAccount?: boolean; // sauvegarder dans le gestionnaire de comptes
+  pin?: string;          // PIN à associer au compte sauvegardé
 };
 
 type AuthContextType = {
-  user: User | null;
+  user: AccountUser | null;
   isLoggedIn: boolean;
   isLoading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<void>;
+  login: (email: string, password: string, options?: LoginOptions) => Promise<void>;
+  register: (email: string, password: string, name: string, options?: LoginOptions) => Promise<void>;
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
-  updateProfile: (userData: Partial<User>) => Promise<void>;
+  updateProfile: (userData: Partial<AccountUser>) => Promise<void>;
   clearError: () => void;
 };
 
-// Clés pour le stockage AsyncStorage
-const STORAGE_KEYS = {
-  USER: '@ecommerce:user',
-  TOKEN: '@ecommerce:token',
-};
+// ─── Context ──────────────────────────────────────────────────────────────────
 
-// Création du contexte avec valeurs par défaut
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoggedIn: false,
@@ -53,265 +50,197 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
+// ─── Provider ─────────────────────────────────────────────────────────────────
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    token: null,
-    isLoading: true,
-    error: null,
-  });
+  const { activeAccount, addAccount } = useMultiAccount();
 
-  // Fonction pour sauvegarder les données d'authentification
-  const saveAuthData = async (user: User, token: string) => {
-    try {
-      await AsyncStorage.multiSet([
-        [STORAGE_KEYS.USER, JSON.stringify(user)],
-        [STORAGE_KEYS.TOKEN, token],
-      ]);
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde des données d\'authentification:', error);
-    }
-  };
+  // ✅ CORRECTION : renommé "AccountUser" → "user" pour éviter le conflit avec le type
+  const [user, setUser] = useState<AccountUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Fonction pour charger les données d'authentification
-  const loadAuthData = async () => {
-    try {
-      setState(prevState => ({ ...prevState, isLoading: true }));
-      
-      const [userString, token] = await AsyncStorage.multiGet([
-        STORAGE_KEYS.USER,
-        STORAGE_KEYS.TOKEN,
-      ]);
-      
-      if (userString[1] && token[1]) {
-        setState({
-          user: JSON.parse(userString[1]),
-          token: token[1],
-          isLoading: false,
-          error: null,
-        });
-      } else {
-        setState({
-          user: null,
-          token: null,
-          isLoading: false,
-          error: null,
-        });
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement des données d\'authentification:', error);
-      setState({
-        user: null,
-        token: null,
-        isLoading: false,
-        error: 'Échec de la connexion automatique',
-      });
-    }
-  };
-
-  // Chargement initial des données d'authentification
+  // ── Synchroniser avec le compte actif du gestionnaire multi-compte ──────────
   useEffect(() => {
-    loadAuthData();
-  }, []);
+    if (activeAccount) {
+      setUser(activeAccount.user);
+    } else {
+      setUser(null);
+    }
+    setIsLoading(false);
+  }, [activeAccount]);
 
-  // Fonction de connexion
-  const login = async (email: string, password: string) => {
+  // ── Login ─────────────────────────────────────────────────────────────────
+
+  const login = async (
+    email: string,
+    password: string,
+    options: LoginOptions = { saveAccount: true }
+  ) => {
     try {
-      setState(prevState => ({ ...prevState, isLoading: true, error: null }));
-      
-      // Ici, vous feriez normalement un appel API pour l'authentification
-      // Exemple:
-      // const response = await api.login(email, password);
-      
-      // Pour démonstration, nous simulons un appel API
-      // Attente simulée pour l'API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Vérification simple des credentials (à remplacer par votre logique API)
-      if (email === 'test@example.com' && password === 'password') {
-        const mockUser = { 
-          id: '123', 
-          email: email,
-          name: 'Utilisateur Test',
-        };
-        const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
-        
-        // Sauvegarde des données d'authentification
-        await saveAuthData(mockUser, mockToken);
-        
-        setState({
-          user: mockUser,
-          token: mockToken,
-          isLoading: false,
-          error: null,
+      setIsLoading(true);
+      setError(null);
+
+      // ✅ CORRECTION : alias "user: apiUser" pour éviter le conflit avec la variable d'état
+      const { user: apiUser, token, refresh_token } = await authService.login({
+        email,
+        password,
+      });
+
+      // Stocker les tokens (source de vérité pour l'interceptor HTTP)
+      await storage.setData('auth_token', token);
+      await storage.setData('refresh_token', refresh_token);
+
+      if (options.saveAccount !== false) {
+        // addAccount met à jour activeAccount → useEffect sync "user" automatiquement
+        await addAccount({
+          user: apiUser,
+          token,
+          refreshToken: refresh_token,
+          pin: options.pin,
         });
       } else {
-        setState(prevState => ({ 
-          ...prevState, 
-          isLoading: false, 
-          error: 'Email ou mot de passe incorrect' 
-        }));
+        setUser(apiUser);
       }
-    } catch (error) {
-      console.error('Erreur de connexion:', error);
-      setState(prevState => ({ 
-        ...prevState, 
-        isLoading: false, 
-        error: 'Échec de la connexion. Veuillez réessayer.' 
-      }));
+    } catch (e: any) {
+      setError(e?.message ?? 'Échec de la connexion.');
+      console.error('Erreur lors du login :', e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Fonction d'inscription
-  const register = async (email: string, password: string, name: string) => {
+  // ── Register ──────────────────────────────────────────────────────────────
+
+  const register = async (
+    email: string,
+    password: string,
+    name: string,
+    options: LoginOptions = { saveAccount: true }
+  ) => {
     try {
-      setState(prevState => ({ ...prevState, isLoading: true, error: null }));
-      
-      // Ici, vous feriez normalement un appel API pour l'inscription
-      // Exemple:
-      // const response = await api.register(email, password, name);
-      
-      // Pour démonstration, nous simulons un appel API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Simuler une réponse API d'inscription réussie
-      const mockUser = { 
-        id: '123', 
-        email: email,
-        name: name,
-      };
-      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
-      
-      // Sauvegarde des données d'authentification
-      await saveAuthData(mockUser, mockToken);
-      
-      setState({
-        user: mockUser,
-        token: mockToken,
-        isLoading: false,
-        error: null,
+      setIsLoading(true);
+      setError(null);
+
+      const { user: apiUser, token, refresh_token } = await authService.register({
+        name,
+        email,
+        password,
+        password_confirmation: password,
       });
-    } catch (error) {
-      console.error('Erreur d\'inscription:', error);
-      setState(prevState => ({ 
-        ...prevState, 
-        isLoading: false, 
-        error: 'Échec de l\'inscription. Veuillez réessayer.'
-      }));
+
+      await storage.setData('auth_token', token);
+      await storage.setData('refresh_token', refresh_token);
+
+      if (options.saveAccount !== false) {
+        await addAccount({
+          user: apiUser,
+          token,
+          refreshToken: refresh_token,
+          pin: options.pin,
+        });
+      } else {
+        setUser(apiUser);
+      }
+    } catch (e: any) {
+      setError(e?.message ?? "Échec de l'inscription. Veuillez réessayer.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Fonction de déconnexion
+  // ── Logout ────────────────────────────────────────────────────────────────
+  // Logout NE supprime PAS le compte du gestionnaire multi-compte.
+  // Il désactive juste la session active → prochain lancement demande le PIN.
+
   const logout = async () => {
     try {
-      setState(prevState => ({ ...prevState, isLoading: true }));
-      
-      // Supprimer les données stockées
-      await AsyncStorage.multiRemove([STORAGE_KEYS.USER, STORAGE_KEYS.TOKEN]);
-      
-      // Réinitialiser l'état
-      setState({
-        user: null,
-        token: null,
-        isLoading: false,
-        error: null,
-      });
-    } catch (error) {
-      console.error('Erreur de déconnexion:', error);
-      setState(prevState => ({ 
-        ...prevState, 
-        isLoading: false, 
-        error: 'Échec de la déconnexion' 
-      }));
+      setIsLoading(true);
+
+      // Appel API optionnel pour invalider le token côté serveur :
+      // try { await authService.logout(); } catch {}
+
+      await storage.removeData('auth_token');
+      await storage.removeData('refresh_token');
+
+      // Désactiver le compte actif sans le supprimer du gestionnaire
+      const store = await MultiAccountStorage.getStore();
+      store.activeAccountId = null;
+      store.accounts = store.accounts.map((a: SavedAccount) => ({ ...a, isActive: false }));
+      await MultiAccountStorage.saveStore(store);
+
+      setUser(null);
+    } catch (e) {
+      setError('Échec de la déconnexion.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Fonction de récupération de mot de passe
+  // ── Forgot password ───────────────────────────────────────────────────────
+
   const forgotPassword = async (email: string) => {
     try {
-      setState(prevState => ({ ...prevState, isLoading: true, error: null }));
-      
-      // Ici, vous feriez normalement un appel API pour la récupération de mot de passe
-      // Exemple:
-      // await api.forgotPassword(email);
-      
-      // Pour démonstration, nous simulons un appel API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setState(prevState => ({ ...prevState, isLoading: false }));
-      
-      // Retourner un succès que l'utilisateur peut afficher
-      return Promise.resolve();
-    } catch (error) {
-      console.error('Erreur de récupération de mot de passe:', error);
-      setState(prevState => ({ 
-        ...prevState, 
-        isLoading: false, 
-        error: 'Échec de l\'envoi de l\'email de récupération' 
-      }));
-      return Promise.reject(error);
+      setIsLoading(true);
+      setError(null);
+      // await apiClient.post('/account/forgot-password', { email });
+      await new Promise((r) => setTimeout(r, 800));
+    } catch (e: any) {
+      setError(e?.message ?? "Échec de l'envoi de l'email de récupération.");
+      throw e;
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Fonction de mise à jour du profil
-  const updateProfile = async (userData: Partial<User>) => {
+  // ── Update profile ────────────────────────────────────────────────────────
+
+  const updateProfile = async (userData: Partial<AccountUser>) => {
     try {
-      if (!state.user) {
-        throw new Error('Utilisateur non connecté');
+      // ✅ CORRECTION : utilise "user" (variable d'état) et non "AccountUser" (type)
+      if (!user) throw new Error('Non connecté');
+      setIsLoading(true);
+      setError(null);
+
+      // const updated = await apiClient.put<AccountUser>('/account/profile', userData);
+      const updatedUser: AccountUser = { ...user, ...userData };
+
+      // Synchroniser avec le compte actif dans le gestionnaire multi-compte
+      if (activeAccount) {
+        await MultiAccountStorage.upsertAccount({
+          user: updatedUser,
+          token: activeAccount.token,
+          refreshToken: activeAccount.refreshToken,
+          existingAccountId: activeAccount.id,
+        });
+        // Le useEffect sur activeAccount mettra "user" à jour automatiquement
+      } else {
+        setUser(updatedUser);
       }
-      
-      setState(prevState => ({ ...prevState, isLoading: true, error: null }));
-      
-      // Ici, vous feriez normalement un appel API pour mettre à jour le profil
-      // Exemple:
-      // const updatedUser = await api.updateProfile(userData, state.token);
-      
-      // Pour démonstration, nous simulons un appel API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mettre à jour l'utilisateur localement
-      const updatedUser = { ...state.user, ...userData };
-      
-      // Sauvegarde des données utilisateur mises à jour
-      await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
-      
-      setState(prevState => ({
-        ...prevState,
-        user: updatedUser,
-        isLoading: false,
-        error: null,
-      }));
-    } catch (error) {
-      console.error('Erreur de mise à jour du profil:', error);
-      setState(prevState => ({ 
-        ...prevState, 
-        isLoading: false, 
-        error: 'Échec de la mise à jour du profil' 
-      }));
+    } catch (e: any) {
+      setError(e?.message ?? 'Échec de la mise à jour du profil.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Fonction pour effacer les erreurs
-  const clearError = () => {
-    setState(prevState => ({ ...prevState, error: null }));
-  };
-
-  // Valeurs à exposer dans le contexte
-  const contextValue: AuthContextType = {
-    user: state.user,
-    isLoggedIn: !!state.user && !!state.token,
-    isLoading: state.isLoading,
-    error: state.error,
-    login,
-    register,
-    logout,
-    forgotPassword,
-    updateProfile,
-    clearError,
-  };
+  const clearError = () => setError(null);
 
   return (
-    <AuthContext.Provider value={contextValue}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoggedIn: !!user,
+        isLoading,
+        error,
+        login,
+        register,
+        logout,
+        forgotPassword,
+        updateProfile,
+        clearError,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

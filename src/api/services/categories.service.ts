@@ -5,6 +5,7 @@ import { Category, Product, Review } from '@/src/@types/models';
 export const categoriesService = {
   async getCategories(params: CategoriesQueryParams = {}): Promise<PaginatedResponse<Category>> {
     const response = await apiClient.get<ApiResponse<PaginatedResponse<Category>>>('/categories', { params });
+
     return response.data;
   },
 

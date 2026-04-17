@@ -19,8 +19,8 @@ const RootNavigator: React.FC = () => {
   }
 
   return (
-    <RootStack.Navigator screenOptions={{ headerShown: false }}>
-      {true ? (
+    <RootStack.Navigator screenOptions={{ headerShown: false }} 
+      initialRouteName={isLoggedIn ? 'Main' : 'Auth'}>
         <>
           <RootStack.Screen name="Main" component={MainTabNavigator} />
           {/* <RootStack.Group screenOptions={{ presentation: 'modal' }}>
@@ -35,9 +35,8 @@ const RootNavigator: React.FC = () => {
             />
           </RootStack.Group> */}
         </>
-      ) : (
         <RootStack.Screen name="Auth" component={AuthStackNavigator} />
-      )}
+      
     </RootStack.Navigator>
   );
 };

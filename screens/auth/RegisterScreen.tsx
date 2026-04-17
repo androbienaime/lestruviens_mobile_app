@@ -21,12 +21,15 @@ import ThemedButton from '@/components/ThemedButton';
 import { ThemedText } from '@/components/ThemedText';
 import { lightColors } from '@/theme';
 import { ThemedLink } from '@/components/ThemedLink';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+    const navigation = useNavigation<NativeStackNavigationProp<any>>();
   
 
   return (
@@ -131,7 +134,14 @@ const RegisterScreen = () => {
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Vous avez déjà un compte? </Text>
-              <ThemedLink >Se connecter</ThemedLink>
+              {/* <ThemedLink > */}
+                <TouchableOpacity 
+                  onPress={() => navigation.navigate('Auth', { screen: 'Login' })}
+                >
+                   <ThemedLink>Se connecter</ThemedLink> 
+                </TouchableOpacity>
+                
+              {/* </ThemedLink> */}
           </View>
           </CustomAnimated>
         </ScrollView>
