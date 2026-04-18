@@ -1,35 +1,20 @@
 // services/auth.service.ts
+import { AccountUser, AuthAccountResponse, LoginPayload } from '@/src/@types/models';
 import apiClient from '../client';
 import { ApiResponse } from '@/src/@types/api';
-import { AccountUser } from '@/utils/multiAccountStorage';
-
-// 🔐 Types spécifiques à l'auth
-
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  // ✅ CORRECTION : renommé "AccountUser" → "user" (minuscule)
-  // "AccountUser" (majuscule) créait un conflit avec le type importé du même nom
-  user: AccountUser;
-  token: string;
-  refresh_token: string;
-}
 
 export const authService = {
 
-  async login(payload: LoginPayload): Promise<AuthResponse> {
+  async login(payload: LoginPayload): Promise<AuthAccountResponse> {
     // ✅ CORRECTION : apiClient.post<T> retourne déjà response.data de type T
-    // Donc on type directement <ApiResponse<AuthResponse>> et on accède à .data
-    // pour obtenir AuthResponse — pas de double .data.data
-    const response = await apiClient.post<ApiResponse<AuthResponse>>(
+    // Donc on type directement <ApiResponse<AuthAccountResponse>> et on accède à .data
+    // pour obtenir AuthAccountResponse — pas de double .data.data
+    const response = await apiClient.post<ApiResponse<AuthAccountResponse>>(
       '/account/login',
       payload
     );
     
-    const data = response.data; // Type : AuthResponse
+    const data = response.data; // Type : AuthAccountResponse
     return {
       user: data.account, // 🔥 mapping ici
       token: data.token,
@@ -43,8 +28,8 @@ export const authService = {
     email: string;
     password: string;
     password_confirmation: string;
-  }): Promise<AuthResponse> {
-    const response = await apiClient.post<ApiResponse<AuthResponse>>(
+  }): Promise<AuthAccountResponse> {
+    const response = await apiClient.post<ApiResponse<AuthAccountResponse>>(
       '/account/register',
       payload
     );
@@ -60,8 +45,8 @@ export const authService = {
     return response.data;
   },
 
-  async refreshToken(refresh_token: string): Promise<AuthResponse> {
-    const response = await apiClient.post<ApiResponse<AuthResponse>>(
+  async refreshToken(refresh_token: string): Promise<AuthAccountResponse> {
+    const response = await apiClient.post<ApiResponse<AuthAccountResponse>>(
       '/account/refresh',
       { refresh_token }
     );

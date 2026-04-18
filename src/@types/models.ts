@@ -8,6 +8,20 @@ export interface User {
     created_at: string;
     updated_at: string;
   }
+
+  export interface AccountUser {
+    id: number;
+    lastname?: string;
+    firstname: string;
+    email: string;
+    phone?: string;
+    avatar?: string;
+    account_cover?: string;
+    account_profile?: string;
+    created_at: string;
+    updated_at: string;
+  }
+  
   
   export interface Product {
     id: number;
@@ -165,11 +179,19 @@ export interface User {
     };
   }
   
-  export interface AuthResponse {
-    user: User;
-    token: string;
+  export interface AuthAccountResponse {
+  user: AccountUser;
+  token: string;
+  refresh_token: string;
   }
 
   export interface Review{
     
   }
+
+  // 🔐 Types spécifiques à l'auth
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}

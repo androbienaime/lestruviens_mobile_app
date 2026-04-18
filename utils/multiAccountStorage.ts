@@ -1,15 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { AccountUser } from '@/src/@types/models';
 // ─── Types ────────────────────────────────────────────────────────────────────
-
-export type AccountUser = {
-  id: string;
-  email: string;
-  name: string;
-  firstname?: string;
-  phone?: string;
-  avatar?: string;
-};
 
 export type SavedAccount = {
   id: string;              // uuid local
@@ -95,8 +86,6 @@ export class MultiAccountStorage {
         // console.log(params.existingAccountId, 'Existing params');
 
     const existingIndex = store.accounts.findIndex((a) => {
-      console.log("a.id →", a.id);
-      console.log("a →", a); // pour voir tout l'objet
       return a.user.id === params.user.id || a.id === params.existingAccountId;
     });
 

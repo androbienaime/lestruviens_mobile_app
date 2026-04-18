@@ -7,14 +7,6 @@ import { storage } from '@/utils/storage';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-// type User = {
-//   id: string;
-//   email: string;
-//   name: string;
-//   phone?: string;
-//   avatar?: string;
-// };
-
 export type LoginOptions = {
   saveAccount?: boolean; // sauvegarder dans le gestionnaire de comptes
   pin?: string;          // PIN à associer au compte sauvegardé
@@ -104,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (e: any) {
       setError(e?.message ?? 'Échec de la connexion.');
-      console.error('Erreur lors du login :', e);
+      console.error('Erreur lors du login :', e?.status);
     } finally {
       setIsLoading(false);
     }

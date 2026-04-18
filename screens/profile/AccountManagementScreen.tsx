@@ -20,7 +20,7 @@ const AccountManagementScreen = () => {
   return (
     <>
       <AccountsManagerScreen onAddAccount={() => {
-          navigation.navigate('Auth', { screen: 'Register' })// Navigue vers l'écran de connexion pour ajouter un nouveau compte
+          navigation.navigate('Auth', { screen: 'Login' })// Navigue vers l'écran de connexion pour ajouter un nouveau compte
       }} />
     </>
   )

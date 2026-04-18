@@ -4,6 +4,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Image,
   StyleSheet,
   ScrollView,
   Alert,
@@ -275,7 +276,7 @@ const AccountsManagerScreen: React.FC<Props> = ({ onSwitched, onAddAccount }) =>
     const doDelete = () =>
       Alert.alert(
         'Supprimer le compte',
-        `Supprimer "${account.user.name}" de cet appareil ?`,
+        `Supprimer "${account.user.firstname}" de cet appareil ?`,
         [
           { text: 'Annuler', style: 'cancel' },
           {
@@ -324,7 +325,6 @@ const AccountsManagerScreen: React.FC<Props> = ({ onSwitched, onAddAccount }) =>
     return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
   };
 
- 
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="dark-content" />
@@ -353,15 +353,21 @@ const AccountsManagerScreen: React.FC<Props> = ({ onSwitched, onAddAccount }) =>
                     isActive && styles.avatarActive,
                   ]}
                 >
-                  <Text style={styles.avatarText}>
-                    {account.user.firstname?.charAt(0)?.toUpperCase() ?? '?'}
-                  </Text>
+                  
+                  {account.user.account_profile != undefined ? (
+                    <Image
+                      source={{ uri: account.user.account_profile }} style={styles.itemImg} />
+                  ) : (
+                    <Text style={styles.avatarText}>
+                      {account.user.firstname?.charAt(0)?.toUpperCase() ?? '?'}
+                    </Text>
+                  )}
                 </View>
 
                 <View style={styles.info}>
                   <View style={styles.nameRow}>
                     <Text style={styles.name} numberOfLines={1}>
-                      {account.user.name}
+                      {account.user.firstname}
                     </Text>
                     {isActive && (
                       <View style={styles.activeBadge}>
@@ -561,6 +567,14 @@ const styles = StyleSheet.create({
   },
   legendTitle: { fontSize: 13, fontWeight: '600', color: '#475569' },
   legendText: { fontSize: 12, color: '#64748B', lineHeight: 18 },
+  itemImg:{
+    height: 50, 
+    width: 50,
+    // borderColor: "gray",
+    borderWidth: 2,
+    borderRadius: 30,
+    // backgroundColor: "red"
+  }
 });
 
 const modalStyles = StyleSheet.create({

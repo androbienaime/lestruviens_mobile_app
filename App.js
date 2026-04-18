@@ -10,6 +10,7 @@ import { ProductProvider } from './context/ProductContext';
 import RootNavigator from './navigation/RootNavigator';
 import MultiAccountProvider, { useMultiAccount } from './context/MultiAccountContext';
 import PinEntryScreen from './screens/PinEntryScreen';
+import { useNavigation } from 'expo-router';
 
 
 // Enable screens for better performance
@@ -90,7 +91,7 @@ const linking = {
 // `authenticated` repart à false à chaque lancement : on ne peut jamais
 // contourner la fenêtre de connexion.
 
-const AppGate = ({ children, onNavigateToLogin }) => {
+const AppGate = ({ children, onNavigateToLogin}) => {
   const { isLoading, accounts } = useMultiAccount();
   const [authenticated, setAuthenticated] = useState(false);
 
